@@ -1,0 +1,35 @@
+// Types for GDP data
+
+export type TimeRange = 'all' | 'last10' | 'last20' | 'last30' | 'since2000';
+
+export interface GdpDataItem {
+  year: string;
+  value: number;
+}
+
+export interface GdpDataSummary {
+  startYear: string;
+  endYear: string;
+  latest: number;
+  peak: {
+    year: string;
+    value: number;
+  };
+  growthSince2000: number;
+}
+
+export type CreditCardUsageItem = {
+  year: string;
+  value: number;
+};
+
+// Raw World Bank API response type
+export interface WorldBankApiResponse {
+  data: {
+    OBS_VALUE: string;
+    DATABASE_ID: string;
+    INDICATOR: string;
+    REF_AREA: string;
+    TIME_PERIOD: string;
+  }[];
+}
