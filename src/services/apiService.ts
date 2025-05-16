@@ -111,3 +111,33 @@ export const fetchCpi = async (): Promise<CpiDataItem[]> => {
     throw error;
   }
 };
+
+export interface MobileInternetBankingItem {
+  year: string;
+  value: number;
+  unit?: string;
+}
+
+export const fetchMobileInternetBanking = async (unitMeasure?: string): Promise<MobileInternetBankingItem[]> => {
+  try {
+    const params: any = {};
+    if (unitMeasure) params.unit_measure = unitMeasure;
+    const response = await axios.get(`${API_BASE_URL}/mobile-internet-banking`, { params });
+    const rawData = Array.isArray(response.data.data?.value)
+      ? response.data.data.value
+      : Array.isArray(response.data.data)
+        ? response.data.data
+        : [];
+    const formattedData: MobileInternetBankingItem[] = rawData
+      .filter((item: any) => item.OBS_VALUE !== null && item.OBS_VALUE !== undefined && !isNaN(Number(item.OBS_VALUE)))
+      .map((item: any) => ({
+        year: item.TIME_PERIOD,
+        value: parseFloat(item.OBS_VALUE),
+        unit: item.UNIT_MEASURE
+      }));
+    return formattedData.sort((a, b) => parseInt(a.year) - parseInt(b.year));
+  } catch (error) {
+    console.error('Error fetching mobile & internet banking data:', error);
+    throw error;
+  }
+};

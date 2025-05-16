@@ -23,6 +23,12 @@ export type CreditCardUsageItem = {
   value: number;
 };
 
+export interface MobileInternetBankingItem {
+  year: string;
+  value: number;
+  unit?: string;
+}
+
 export interface InflationDataItem {
   year: string;
   value: number;

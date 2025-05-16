@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, TrendingUp, CreditCard, Percent, CircleDollarSign } from 'lucide-react';
+import { Home, TrendingUp, CreditCard, Percent, CircleDollarSign, Wifi } from 'lucide-react';
 import { TabType } from '../App';
 
 interface TabNavigationProps {
@@ -55,6 +55,15 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, setActiveTab }
         >
           <CircleDollarSign className="w-4 h-4 mr-2 text-orange-500" />
           CPI
+        </button>
+        <button
+          className={`tab flex items-center ${
+            activeTab === 'mobileInternetBanking' ? 'tab-active' : 'tab-inactive'
+          }`}
+          onClick={() => setActiveTab('mobileInternetBanking' as TabType)}
+        >
+          <Wifi className="w-4 h-4 mr-2 text-orange-500" />
+          Mobile & Internet Banking
         </button>
       </div>
     </div>
