@@ -23,6 +23,16 @@ export type CreditCardUsageItem = {
   value: number;
 };
 
+export interface InflationDataItem {
+  year: string;
+  value: number;
+}
+
+export interface CpiDataItem {
+  year: string;
+  value: number;
+}
+
 // Raw World Bank API response type
 export interface WorldBankApiResponse {
   data: {

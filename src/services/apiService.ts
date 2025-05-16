@@ -59,3 +59,55 @@ export const fetchCreditCardUsage = async (unitMeasure?: string): Promise<Credit
     throw error;
   }
 };
+
+export interface InflationDataItem {
+  year: string;
+  value: number;
+}
+
+export const fetchInflation = async (): Promise<InflationDataItem[]> => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/inflation`);
+    const rawData = Array.isArray(response.data.data?.value)
+      ? response.data.data.value
+      : Array.isArray(response.data.data)
+        ? response.data.data
+        : [];
+    const formattedData: InflationDataItem[] = rawData
+      .filter((item: any) => item.OBS_VALUE !== null && item.OBS_VALUE !== undefined && !isNaN(Number(item.OBS_VALUE)))
+      .map((item: any) => ({
+        year: item.TIME_PERIOD,
+        value: parseFloat(item.OBS_VALUE)
+      }));
+    return formattedData.sort((a, b) => parseInt(a.year) - parseInt(b.year));
+  } catch (error) {
+    console.error('Error fetching inflation data:', error);
+    throw error;
+  }
+};
+
+export interface CpiDataItem {
+  year: string;
+  value: number;
+}
+
+export const fetchCpi = async (): Promise<CpiDataItem[]> => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/cpi`);
+    const rawData = Array.isArray(response.data.data?.value)
+      ? response.data.data.value
+      : Array.isArray(response.data.data)
+        ? response.data.data
+        : [];
+    const formattedData: CpiDataItem[] = rawData
+      .filter((item: any) => item.OBS_VALUE !== null && item.OBS_VALUE !== undefined && !isNaN(Number(item.OBS_VALUE)))
+      .map((item: any) => ({
+        year: item.TIME_PERIOD,
+        value: parseFloat(item.OBS_VALUE)
+      }));
+    return formattedData.sort((a, b) => parseInt(a.year) - parseInt(b.year));
+  } catch (error) {
+    console.error('Error fetching CPI data:', error);
+    throw error;
+  }
+};

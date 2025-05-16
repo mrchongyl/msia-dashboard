@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, TrendingUp, CreditCard } from 'lucide-react';
+import { Home, TrendingUp, CreditCard, Percent, CircleDollarSign } from 'lucide-react';
 import { TabType } from '../App';
 
 interface TabNavigationProps {
@@ -37,6 +37,24 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, setActiveTab }
         >
           <CreditCard className="w-4 h-4 mr-2" />
           Credit Card Usage
+        </button>
+        <button
+          className={`tab flex items-center ${
+            activeTab === 'inflation' ? 'tab-active' : 'tab-inactive'
+          }`}
+          onClick={() => setActiveTab('inflation' as TabType)}
+        >
+          <Percent className="w-4 h-4 mr-2 text-purple-600" />
+          Inflation
+        </button>
+        <button
+          className={`tab flex items-center ${
+            activeTab === 'cpi' ? 'tab-active' : 'tab-inactive'
+          }`}
+          onClick={() => setActiveTab('cpi' as TabType)}
+        >
+          <CircleDollarSign className="w-4 h-4 mr-2 text-orange-500" />
+          CPI
         </button>
       </div>
     </div>

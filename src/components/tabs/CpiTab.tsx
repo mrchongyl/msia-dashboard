@@ -1,0 +1,167 @@
+import React, { useState } from 'react';
+import { useQuery } from 'react-query';
+import { TrendingUp, Download, BarChart, CircleDollarSign } from 'lucide-react';
+import { fetchCpi } from '../../services/apiService';
+import LineChart from '../visualizations/LineChart';
+import Table, { TableColumn } from '../visualizations/Table';
+import LoadingSpinner from '../ui/LoadingSpinner';
+import ErrorMessage from '../ui/ErrorMessage';
+import { CpiDataItem, TimeRange } from '../../types/gdpTypes';
+import { calculateGdpSummary } from '../../utils/dataUtils';
+
+const CpiTab: React.FC = () => {
+  const [timeRange, setTimeRange] = useState<TimeRange>('all');
+  const { data, isLoading, error } = useQuery('cpi', fetchCpi);
+
+  // Filter data based on selected time range
+  const getFilteredData = (): CpiDataItem[] => {
+    if (!data) return [];
+    switch (timeRange) {
+      case 'last10':
+        return data.slice(-10);
+      case 'last20':
+        return data.slice(-20);
+      case 'last30':
+        return data.slice(-30);
+      case 'since2000':
+        return data.filter(item => parseInt(item.year) >= 2000);
+      default:
+        return data;
+    }
+  };
+
+  const filteredData = data ? getFilteredData() : [];
+  const summary = filteredData.length > 0 ? calculateGdpSummary(filteredData) : null;
+
+  // Generate CSV from data
+  const generateCsv = () => {
+    if (!data) return;
+    const headers = ['Year', 'Consumer Price Index (CPI)'];
+    const csvRows = [
+      headers.join(','),
+      ...filteredData.map(item => `${item.year},${item.value}`)
+    ];
+    const csvString = csvRows.join('\n');
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `malaysia-cpi-${timeRange}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Prepare data for line chart
+  const chartData = filteredData.map(item => ({ x: item.year, y: item.value }));
+
+  // Prepare columns for table
+  const columns: TableColumn<CpiDataItem>[] = [
+    { key: 'year', label: 'Year', align: 'left' },
+    { key: 'value', label: 'CPI', align: 'right', formatter: (v) => v.toFixed(2) },
+  ];
+
+  if (isLoading) return <LoadingSpinner />;
+  if (error) return <ErrorMessage message="Failed to load CPI data" />;
+
+  return (
+    <div className="slide-in">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+        <div>
+          <h2 className="text-2xl font-bold text-slate-800 flex items-center">
+            <CircleDollarSign className="mr-2 h-6 w-6 text-orange-500" />
+            Consumer Price Index (CPI)
+          </h2>
+          <p className="text-slate-600 mt-1">
+            Annual Consumer Price Index (CPI) for Malaysia
+          </p>
+        </div>
+        <div className="mt-4 md:mt-0 flex flex-wrap gap-2">
+          <select
+            className="px-3 py-2 rounded border border-slate-300 text-slate-700 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+            value={timeRange}
+            onChange={(e) => setTimeRange(e.target.value as TimeRange)}
+          >
+            <option value="all">All Time</option>
+            <option value="last10">Last 10 Years</option>
+            <option value="last20">Last 20 Years</option>
+            <option value="last30">Last 30 Years</option>
+            <option value="since2000">Since 2000</option>
+          </select>
+          <button
+            onClick={generateCsv}
+            className="btn btn-primary flex items-center bg-orange-500 hover:bg-orange-600 border-orange-500"
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Export CSV
+          </button>
+        </div>
+      </div>
+
+      {summary && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="card p-6">
+            <div className="flex items-start">
+              <div className="rounded-full bg-orange-100 p-3 mr-4">
+                <CircleDollarSign className="h-6 w-6 text-orange-500" />
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-slate-500">Latest CPI</h3>
+                <p className="text-2xl font-semibold number-mono text-slate-800">
+                  {summary.latest.toFixed(2)}
+                </p>
+                <p className="text-xs text-slate-500">Year {summary.endYear}</p>
+              </div>
+            </div>
+          </div>
+          <div className="card p-6">
+            <div className="flex items-start">
+              <div className="rounded-full bg-orange-100 p-3 mr-4">
+                <TrendingUp className="h-6 w-6 text-orange-500" />
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-slate-500">Growth Since {summary.startYear}</h3>
+                <p className="text-2xl font-semibold number-mono text-slate-800">
+                  {summary.growthSince2000.toFixed(2)}%
+                </p>
+                <p className="text-xs text-slate-500">{summary.startYear} - {summary.endYear}</p>
+              </div>
+            </div>
+          </div>
+          <div className="card p-6">
+            <div className="flex items-start">
+              <div className="rounded-full bg-orange-100 p-3 mr-4">
+                <BarChart className="h-6 w-6 text-orange-500" />
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-slate-500">Historical Peak</h3>
+                <p className="text-2xl font-semibold number-mono text-slate-800">
+                  {summary.peak.value.toFixed(2)}
+                </p>
+                <p className="text-xs text-slate-500">Year {summary.peak.year}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Chart Section */}
+      <div className="card p-6 mb-8">
+        <LineChart
+          data={chartData}
+          label="CPI"
+          color="rgb(251,146,60)"
+          yAxisLabel="CPI"
+          valueFormatter={(v) => v.toFixed(2)}
+        />
+      </div>
+
+      {/* Table Section */}
+      <div className="card">
+        <Table columns={columns} data={filteredData} />
+      </div>
+    </div>
+  );
+};
+
+export default CpiTab;

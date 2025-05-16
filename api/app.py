@@ -72,6 +72,60 @@ def get_credit_card_usage():
     except Exception as e:
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500
 
+@app.route('/api/inflation', methods=['GET'])
+def get_inflation():
+    """Proxy endpoint to fetch inflation (CPI, annual %) data from World Bank Data360 API"""
+    try:
+        start_year = request.args.get('from', '1960')
+        end_year = request.args.get('to', '2023')
+        url = f"https://data360api.worldbank.org/data360/data"
+        params = {
+            'DATABASE_ID': 'WB_WDI',
+            'INDICATOR': 'WB_WDI_FP_CPI_TOTL_ZG',
+            'REF_AREA': 'MYS',
+            'timePeriodFrom': start_year,
+            'timePeriodTo': end_year,
+            'skip': 0
+        }
+        response = requests.get(url, params=params)
+        response.raise_for_status()
+        wb_data = response.json()
+        if isinstance(wb_data, dict) and 'data' in wb_data:
+            return jsonify({'data': wb_data['data']})
+        else:
+            return jsonify({'data': wb_data})
+    except requests.exceptions.RequestException as e:
+        return jsonify({"error": f"API request failed: {str(e)}"}), 500
+    except Exception as e:
+        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
+
+@app.route('/api/cpi', methods=['GET'])
+def get_cpi():
+    """Proxy endpoint to fetch Consumer Price Index (CPI) data from World Bank Data360 API"""
+    try:
+        start_year = request.args.get('from', '1960')
+        end_year = request.args.get('to', '2023')
+        url = f"https://data360api.worldbank.org/data360/data"
+        params = {
+            'DATABASE_ID': 'WB_WDI',
+            'INDICATOR': 'WB_WDI_FP_CPI_TOTL',
+            'REF_AREA': 'MYS',
+            'timePeriodFrom': start_year,
+            'timePeriodTo': end_year,
+            'skip': 0
+        }
+        response = requests.get(url, params=params)
+        response.raise_for_status()
+        wb_data = response.json()
+        if isinstance(wb_data, dict) and 'data' in wb_data:
+            return jsonify({'data': wb_data['data']})
+        else:
+            return jsonify({'data': wb_data})
+    except requests.exceptions.RequestException as e:
+        return jsonify({"error": f"API request failed: {str(e)}"}), 500
+    except Exception as e:
+        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)

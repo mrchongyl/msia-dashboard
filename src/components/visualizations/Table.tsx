@@ -54,10 +54,10 @@ function Table<T extends { [key: string]: any }>({ columns, data, rowsPerPage = 
               {columns.map(col => (
                 <th
                   key={String(col.key)}
-                  className={`px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider cursor-pointer text-${col.align || 'left'}`}
+                  className={`px-6 py-3 text-xs font-bold text-slate-800 uppercase tracking-wider cursor-pointer text-${col.align || 'left'} ${col.align === 'right' ? 'text-right' : ''}`}
                   onClick={() => handleSort(col.key)}
                 >
-                  <div className="flex items-center">
+                  <div className={`flex items-center ${col.align === 'right' ? 'justify-end' : ''}`}>
                     {col.label}
                     {sortField === col.key ? (
                       sortDirection === 'asc' ? ' ▲' : ' ▼'
@@ -75,7 +75,7 @@ function Table<T extends { [key: string]: any }>({ columns, data, rowsPerPage = 
                 {columns.map(col => (
                   <td
                     key={String(col.key)}
-                    className={`px-6 py-4 whitespace-nowrap text-sm text-slate-800 text-${col.align || 'left'} number-mono`}
+                    className={`px-6 py-4 whitespace-nowrap text-sm text-slate-800 number-mono ${col.align === 'right' ? 'text-right' : 'text-left'}`}
                   >
                     {col.formatter ? col.formatter(row[col.key], row) : row[col.key]}
                   </td>

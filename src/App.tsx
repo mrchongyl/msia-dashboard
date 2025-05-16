@@ -4,9 +4,11 @@ import TabNavigation from './components/TabNavigation';
 import OverviewTab from './components/tabs/OverviewTab';
 import GdpTab from './components/tabs/GdpTab';
 import CreditCardUsageTab from './components/tabs/CreditCardUsageTab';
+import InflationTab from './components/tabs/InflationTab';
+import CpiTab from './components/tabs/CpiTab';
 import Footer from './components/Footer';
 
-export type TabType = 'overview' | 'gdp' | 'creditCardUsage';
+export type TabType = 'overview' | 'gdp' | 'creditCardUsage' | 'inflation' | 'cpi';
 
 function App() {
   const [activeTab, setActiveTab] = useState<TabType>('overview');
@@ -20,6 +22,8 @@ function App() {
         {activeTab === 'overview' && <OverviewTab />}
         {activeTab === 'gdp' && <GdpTab />}
         {activeTab === 'creditCardUsage' && <CreditCardUsageTab />}
+        {activeTab === 'inflation' && <InflationTab />}
+        {activeTab === 'cpi' && <CpiTab />}
       </main>
       <Footer />
     </div>
