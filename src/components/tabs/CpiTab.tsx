@@ -36,7 +36,7 @@ const CpiTab: React.FC = () => {
   // Generate CSV from data
   const generateCsv = () => {
     if (!data) return;
-    const headers = ['Year', 'Consumer Price Index (CPI)'];
+    const headers = ['Year', 'Consumer Price Index (CPI'];
     const csvRows = [
       headers.join(','),
       ...filteredData.map(item => `${item.year},${item.value}`)
@@ -70,7 +70,7 @@ const CpiTab: React.FC = () => {
         <div>
           <h2 className="text-2xl font-bold text-slate-800 flex items-center">
             <CircleDollarSign className="mr-2 h-6 w-6 text-orange-500" />
-            Consumer Price Index (CPI)
+            Consumer Price Index (CPI) (2010 = 100)
           </h2>
           <p className="text-slate-600 mt-1">
             Annual Consumer Price Index (CPI) for Malaysia
