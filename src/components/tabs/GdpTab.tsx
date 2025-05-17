@@ -66,15 +66,6 @@ const GdpTab: React.FC = () => {
     document.body.removeChild(link);
   };
 
-  // Prepare data for line chart
-  const chartData = filteredData.map(item => ({ x: item.year, y: item.value }));
-
-  // Prepare columns for table
-  const columns: TableColumn<GdpDataItem>[] = [
-    { key: 'year', label: 'Year', align: 'left' },
-    { key: 'value', label: 'GDP Per Capita', align: 'right', formatter: (v) => formatCurrency(v) },
-  ];
-
   // Statistical analysis
   const values = filteredData.map(d => d.value);
   const mean = values.length ? ss.mean(values) : null;
@@ -86,6 +77,24 @@ const GdpTab: React.FC = () => {
   const intercept = regResult ? regResult.equation[1] : null;
   const r2 = regResult ? regResult.r2 : null;
 
+  // Prepare data for line chart
+  const chartData = filteredData.map(item => ({ x: item.year, y: item.value }));
+
+  // Regression line data
+  let regressionLine: { x: string, y: number }[] = [];
+  if (regResult && filteredData.length > 1) {
+    regressionLine = filteredData.map(item => ({
+      x: item.year,
+      y: regResult.predict(+item.year)[1]
+    }));
+  }
+
+  // Prepare columns for table
+  const columns: TableColumn<GdpDataItem>[] = [
+    { key: 'year', label: 'Year', align: 'left' },
+    { key: 'value', label: 'GDP Per Capita', align: 'right', formatter: (v) => formatCurrency(v) },
+  ];
+
   if (isLoading) return <LoadingSpinner />;
   if (error) return <ErrorMessage message="Failed to load GDP data" />;
   
@@ -94,7 +103,7 @@ const GdpTab: React.FC = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
         <div>
           <h2 className="text-2xl font-bold text-slate-800 flex items-center">
-            <TrendingUp className="mr-2 h-6 w-6" />
+            <TrendingUp className="mr-2 h-6 w-6 text-blue-500" />
             GDP Per Capita (current US$)
           </h2>
           <p className="text-slate-600 mt-1">
@@ -181,6 +190,11 @@ const GdpTab: React.FC = () => {
           color="rgb(59, 130, 246)"
           yAxisLabel="GDP Per Capita (US$)"
           valueFormatter={(v) => `$${v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+          regressionLine={regressionLine.length > 1 ? {
+            data: regressionLine,
+            label: 'Regression Line',
+            color: 'rgba(59,130,246,0.5)'
+          } : undefined}
         />
       </div>
 

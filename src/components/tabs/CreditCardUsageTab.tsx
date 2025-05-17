@@ -61,6 +61,35 @@ const CreditCardUsageTab: React.FC = () => {
   // Calculate summary using only filtered data for the selected unit
   const summary = filteredData.length > 0 ? calculateCreditCardSummary(filteredData) : null;
 
+  // Statistical analysis
+  const values = filteredData.map(d => d.value);
+  const mean = values.length ? ss.mean(values) : null;
+  const median = values.length ? ss.median(values) : null;
+  const stddev = values.length ? ss.standardDeviation(values) : null;
+  const regData = filteredData.map(d => [+d.year, d.value]);
+  const regResult = regData.length > 1 ? regression.linear(regData) : null;
+  const slope = regResult ? regResult.equation[0] : null;
+  const intercept = regResult ? regResult.equation[1] : null;
+  const r2 = regResult ? regResult.r2 : null;
+
+  // Prepare data for line chart
+  const chartData = filteredData.map(item => ({ x: item.year, y: item.value }));
+
+  // Regression line data
+  let regressionLine: { x: string, y: number }[] = [];
+  if (regResult && filteredData.length > 1) {
+    regressionLine = filteredData.map(item => ({
+      x: item.year,
+      y: regResult.predict(+item.year)[1]
+    }));
+  }
+
+  // Prepare columns for table
+  const columns: TableColumn<CreditCardUsageItem>[] = [
+    { key: 'year', label: 'Year', align: 'left' },
+    { key: 'value', label: 'Credit Card Usage', align: 'right', formatter: (v) => v.toLocaleString('en-US') },
+  ];
+
   // Generate CSV from data
   const generateCsv = () => {
     if (!data) return;
@@ -79,26 +108,6 @@ const CreditCardUsageTab: React.FC = () => {
     link.click();
     document.body.removeChild(link);
   };
-
-  // Prepare data for line chart
-  const chartData = filteredData.map(item => ({ x: item.year, y: item.value }));
-
-  // Prepare columns for table
-  const columns: TableColumn<CreditCardUsageItem>[] = [
-    { key: 'year', label: 'Year', align: 'left' },
-    { key: 'value', label: 'Credit Card Usage', align: 'right', formatter: (v) => v.toLocaleString('en-US') },
-  ];
-
-  // Statistical analysis
-  const values = filteredData.map(d => d.value);
-  const mean = values.length ? ss.mean(values) : null;
-  const median = values.length ? ss.median(values) : null;
-  const stddev = values.length ? ss.standardDeviation(values) : null;
-  const regData = filteredData.map(d => [+d.year, d.value]);
-  const regResult = regData.length > 1 ? regression.linear(regData) : null;
-  const slope = regResult ? regResult.equation[0] : null;
-  const intercept = regResult ? regResult.equation[1] : null;
-  const r2 = regResult ? regResult.r2 : null;
 
   if (isLoading) return <LoadingSpinner />;
   if (error) return <ErrorMessage message="Failed to load credit card usage data" />;
@@ -198,10 +207,15 @@ const CreditCardUsageTab: React.FC = () => {
       <div className="card p-6 mb-8">
         <LineChart
           data={chartData}
-          label="Credit Card Usage (Count)"
+          label="Credit Card Usage"
           color="rgb(34,197,94)"
-          yAxisLabel="Credit Card Usage (Count)"
-          valueFormatter={(v) => v.toLocaleString('en-US')}
+          yAxisLabel="Credit Card Usage"
+          valueFormatter={(v) => v.toLocaleString('en-US', { maximumFractionDigits: 2 })}
+          regressionLine={regressionLine.length > 1 ? {
+            data: regressionLine,
+            label: 'Regression Line',
+            color: 'rgba(34,197,94,0.5)'
+          } : undefined}
         />
       </div>
 

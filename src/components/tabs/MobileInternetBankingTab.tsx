@@ -55,6 +55,18 @@ const MobileInternetBankingTab: React.FC = () => {
   const intercept = regResult ? regResult.equation[1] : null;
   const r2 = regResult ? regResult.r2 : null;
 
+  // Prepare data for line chart
+  const chartData = filteredData.map(item => ({ x: item.year, y: item.value }));
+
+  // Regression line data
+  let regressionLine: { x: string, y: number }[] = [];
+  if (regResult && filteredData.length > 1) {
+    regressionLine = filteredData.map(item => ({
+      x: item.year,
+      y: regResult.predict(+item.year)[1]
+    }));
+  }
+
   // Generate CSV from data
   const generateCsv = () => {
     if (!data) return;
@@ -73,9 +85,6 @@ const MobileInternetBankingTab: React.FC = () => {
     link.click();
     document.body.removeChild(link);
   };
-
-  // Prepare data for line chart
-  const chartData = filteredData.map(item => ({ x: item.year, y: item.value }));
 
   // Prepare columns for table
   const columns: TableColumn<MobileInternetBankingItem>[] = [
@@ -185,6 +194,11 @@ const MobileInternetBankingTab: React.FC = () => {
           color="rgb(239,68,68)"
           yAxisLabel="Mobile & Internet Banking"
           valueFormatter={(v) => v.toLocaleString('en-US', { maximumFractionDigits: 2 })}
+          regressionLine={regressionLine.length > 1 ? {
+            data: regressionLine,
+            label: 'Regression Line',
+            color: 'rgba(239,68,68,0.5)'
+          } : undefined}
         />
       </div>
 

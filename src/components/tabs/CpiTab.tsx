@@ -71,15 +71,6 @@ const CpiTab: React.FC = () => {
     document.body.removeChild(link);
   };
 
-  // Prepare data for line chart
-  const chartData = filteredData.map(item => ({ x: item.year, y: item.value }));
-
-  // Prepare columns for table
-  const columns: TableColumn<CpiDataItem>[] = [
-    { key: 'year', label: 'Year', align: 'left' },
-    { key: 'value', label: 'CPI Value', align: 'right', formatter: (v) => v.toFixed(2) },
-  ];
-
   // Statistical analysis
   const values = filteredData.map(d => d.value);
   const mean = values.length ? ss.mean(values) : null;
@@ -90,6 +81,24 @@ const CpiTab: React.FC = () => {
   const slope = regResult ? regResult.equation[0] : null;
   const intercept = regResult ? regResult.equation[1] : null;
   const r2 = regResult ? regResult.r2 : null;
+
+  // Prepare data for line chart
+  const chartData = filteredData.map(item => ({ x: item.year, y: item.value }));
+
+  // Regression line data
+  let regressionLine: { x: string, y: number }[] = [];
+  if (regResult && filteredData.length > 1) {
+    regressionLine = filteredData.map(item => ({
+      x: item.year,
+      y: regResult.predict(+item.year)[1]
+    }));
+  }
+
+  // Prepare columns for table
+  const columns: TableColumn<CpiDataItem>[] = [
+    { key: 'year', label: 'Year', align: 'left' },
+    { key: 'value', label: 'CPI Value', align: 'right', formatter: (v) => v.toFixed(2) },
+  ];
 
   if (isLoading) return <LoadingSpinner />;
   if (error) return <ErrorMessage message="Failed to load CPI data" />;
@@ -184,6 +193,11 @@ const CpiTab: React.FC = () => {
           color="rgb(251,146,60)"
           yAxisLabel="CPI Value"
           valueFormatter={(v) => v.toFixed(2)}
+          regressionLine={regressionLine.length > 1 ? {
+            data: regressionLine,
+            label: 'Regression Line',
+            color: 'rgba(251,146,60,0.5)'
+          } : undefined}
         />
       </div>
 

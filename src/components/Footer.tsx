@@ -14,7 +14,7 @@ const Footer: React.FC = () => {
           </div>
           <div className="mt-4 md:mt-0">
             <p className="text-sm">
-              © {currentYear} Malaysia Economic Dashboard
+              © {currentYear} Malaysia Economic Dashboard (Group 3)
             </p>
           </div>
         </div>

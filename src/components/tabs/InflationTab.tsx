@@ -71,18 +71,8 @@ const InflationTab: React.FC = () => {
     document.body.removeChild(link);
   };
 
-  // Prepare data for line chart
-  const chartData = filteredData.map(item => ({ x: item.year, y: item.value }));
-
-  // Prepare columns for table
-  const columns: TableColumn<InflationDataItem>[] = [
-    { key: 'year', label: 'Year', align: 'left' },
-    { key: 'value', label: 'Inflation Rate (%)', align: 'right', formatter: (v) => v.toFixed(2) + '%' },
-  ];
-
   // Statistical analysis
   const values = filteredData.map(d => d.value);
-  const years = filteredData.map(d => +d.year);
   const mean = values.length ? ss.mean(values) : null;
   const median = values.length ? ss.median(values) : null;
   const stddev = values.length ? ss.standardDeviation(values) : null;
@@ -91,6 +81,24 @@ const InflationTab: React.FC = () => {
   const slope = regResult ? regResult.equation[0] : null;
   const intercept = regResult ? regResult.equation[1] : null;
   const r2 = regResult ? regResult.r2 : null;
+
+  // Prepare data for line chart
+  const chartData = filteredData.map(item => ({ x: item.year, y: item.value }));
+
+  // Regression line data
+  let regressionLine: { x: string, y: number }[] = [];
+  if (regResult && filteredData.length > 1) {
+    regressionLine = filteredData.map(item => ({
+      x: item.year,
+      y: regResult.predict(+item.year)[1]
+    }));
+  }
+
+  // Prepare columns for table
+  const columns: TableColumn<InflationDataItem>[] = [
+    { key: 'year', label: 'Year', align: 'left' },
+    { key: 'value', label: 'Inflation Rate (%)', align: 'right', formatter: (v) => v.toFixed(2) + '%' },
+  ];
 
   if (isLoading) return <LoadingSpinner />;
   if (error) return <ErrorMessage message="Failed to load inflation data" />;
@@ -185,6 +193,11 @@ const InflationTab: React.FC = () => {
           color="rgb(168,85,247)"
           yAxisLabel="Inflation Rate (%)"
           valueFormatter={(v) => v.toFixed(2) + '%'}
+          regressionLine={regressionLine.length > 1 ? {
+            data: regressionLine,
+            label: 'Regression Line',
+            color: 'rgba(168,85,247,0.5)'
+          } : undefined}
         />
       </div>
 

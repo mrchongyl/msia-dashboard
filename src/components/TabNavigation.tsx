@@ -10,14 +10,14 @@ interface TabNavigationProps {
 const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, setActiveTab }) => {
   return (
     <div className="mb-8">
-      <div className="flex space-x-2 bg-slate-100 p-1 rounded-lg w-fit">
+      <div className="flex flex-wrap gap-2 bg-slate-100 p-1 rounded-lg w-full overflow-x-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
         <button
           className={`tab flex items-center ${
             activeTab === 'overview' ? 'tab-active' : 'tab-inactive'
           }`}
           onClick={() => setActiveTab('overview')}
         >
-          <Home className="w-4 h-4 mr-2" />
+          <Home className="w-4 h-4 mr-2 " />
           Overview
         </button>
         <button
@@ -26,7 +26,7 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, setActiveTab }
           }`}
           onClick={() => setActiveTab('gdp')}
         >
-          <TrendingUp className="w-4 h-4 mr-2" />
+          <TrendingUp className="w-4 h-4 mr-2 text-blue-500" />
           GDP Per Capita
         </button>
         <button
@@ -53,7 +53,7 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, setActiveTab }
           }`}
           onClick={() => setActiveTab('creditCardUsage' as TabType)}
         >
-          <CreditCard className="w-4 h-4 mr-2" />
+          <CreditCard className="w-4 h-4 mr-2 text-green-500"  />
           Credit Card Usage
         </button>
         <button
@@ -62,7 +62,7 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, setActiveTab }
           }`}
           onClick={() => setActiveTab('mobileInternetBanking' as TabType)}
         >
-          <Wifi className="w-4 h-4 mr-2 text-orange-500" />
+          <Wifi className="w-4 h-4 mr-2 text-red-500" />
           Mobile & Internet Banking
         </button>
       </div>

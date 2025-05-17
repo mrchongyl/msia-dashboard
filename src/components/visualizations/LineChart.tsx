@@ -28,12 +28,19 @@ export interface LineChartData {
   y: number;
 }
 
+export interface LineChartRegressionLine {
+  data: LineChartData[];
+  label?: string;
+  color?: string;
+}
+
 interface LineChartProps {
   data: LineChartData[];
   label: string;
   color?: string;
   yAxisLabel?: string;
   valueFormatter?: (value: number) => string;
+  regressionLine?: LineChartRegressionLine;
 }
 
 const LineChart: React.FC<LineChartProps> = ({
@@ -41,7 +48,8 @@ const LineChart: React.FC<LineChartProps> = ({
   label,
   color = 'rgb(59, 130, 246)',
   yAxisLabel = '',
-  valueFormatter = (v) => v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  valueFormatter = (v) => v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+  regressionLine
 }) => {
   const chartData = {
     labels: data.map(item => item.x),
@@ -61,6 +69,22 @@ const LineChart: React.FC<LineChartProps> = ({
         pointBorderColor: '#fff',
         pointBorderWidth: 2,
       },
+      ...(regressionLine && regressionLine.data.length > 1 ? [{
+        label: regressionLine.label || 'Regression Line',
+        data: regressionLine.data.map(item => item.y),
+        borderColor: regressionLine.color || 'rgba(59,130,246,0.5)',
+        borderWidth: 2,
+        fill: false,
+        tension: 0,
+        pointRadius: 0,
+        borderDash: [6, 6],
+        pointHoverRadius: 0,
+        pointBackgroundColor: regressionLine.color || 'rgba(59,130,246,0.5)',
+        pointHoverBackgroundColor: regressionLine.color || 'rgba(59,130,246,0.5)',
+        pointBorderColor: 'rgba(0,0,0,0)',
+        pointBorderWidth: 0,
+        order: 10,
+      }] : [])
     ],
   };
 
@@ -69,7 +93,7 @@ const LineChart: React.FC<LineChartProps> = ({
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: 'top' as const,
+        position: 'top',
         labels: {
           font: {
             family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica',
@@ -89,6 +113,7 @@ const LineChart: React.FC<LineChartProps> = ({
         bodyFont: {
           family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica',
           size: 13,
+          weight: 'bold',
         },
         padding: 12,
         cornerRadius: 8,
@@ -107,6 +132,7 @@ const LineChart: React.FC<LineChartProps> = ({
         ticks: {
           font: {
             family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica',
+            weight: 'bold',
           },
           callback: function(value: any, index: number) {
             const x = data[index]?.x;
@@ -127,6 +153,7 @@ const LineChart: React.FC<LineChartProps> = ({
         ticks: {
           font: {
             family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica',
+            weight: 'bold',
           },
           callback: function(value: any) {
             return valueFormatter(value);
@@ -139,7 +166,7 @@ const LineChart: React.FC<LineChartProps> = ({
     },
     interaction: {
       intersect: false,
-      mode: 'index',
+      mode: 'index' as const,
     },
     animation: {
       duration: 1000,
