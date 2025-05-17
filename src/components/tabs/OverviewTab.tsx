@@ -92,13 +92,13 @@ const OverviewTab: React.FC = () => {
     {
       label: 'Credit Card Usage',
       color: 'rgb(34, 197, 94)', // green
-      data: creditCardData?.map(d => ({ x: d.year, y: d.value })) || [],
+      data: creditCard10P3AD.map(d => ({ x: d.year, y: d.value })),
       visible: visibleMetrics.includes('Credit Card Usage'),
     },
     {
       label: 'Mobile & Internet Banking',
       color: 'rgb(239, 68, 68)', // red
-      data: mibData?.map(d => ({ x: d.year, y: d.value })) || [],
+      data: mib10P3AD.map(d => ({ x: d.year, y: d.value })),
       visible: visibleMetrics.includes('Mobile & Internet Banking'),
     },
   ];
