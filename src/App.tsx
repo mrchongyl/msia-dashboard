@@ -7,9 +7,10 @@ import CreditCardUsageTab from './components/tabs/CreditCardUsageTab';
 import InflationTab from './components/tabs/InflationTab';
 import CpiTab from './components/tabs/CpiTab';
 import MobileInternetBankingTab from './components/tabs/MobileInternetBankingTab';
+import DocumentationTab from './components/tabs/DocumentationTab';
 import Footer from './components/Footer';
 
-export type TabType = 'overview' | 'gdp' | 'creditCardUsage' | 'inflation' | 'cpi' | 'mobileInternetBanking';
+export type TabType = 'overview' | 'gdp' | 'creditCardUsage' | 'inflation' | 'cpi' | 'mobileInternetBanking' | 'documentation';
 
 function App() {
   const [activeTab, setActiveTab] = useState<TabType>('overview');
@@ -26,6 +27,7 @@ function App() {
         {activeTab === 'inflation' && <InflationTab />}
         {activeTab === 'cpi' && <CpiTab />}
         {activeTab === 'mobileInternetBanking' && <MobileInternetBankingTab />}
+        {activeTab === 'documentation' && <DocumentationTab />}
       </main>
       <Footer />
     </div>

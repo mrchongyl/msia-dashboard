@@ -65,6 +65,15 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, setActiveTab }
           <Wifi className="w-4 h-4 mr-2 text-red-500" />
           Mobile & Internet Banking
         </button>
+        <button
+          className={`tab flex items-center ${
+            activeTab === 'documentation' ? 'tab-active' : 'tab-inactive'
+          }`}
+          onClick={() => setActiveTab('documentation' as TabType)}
+        >
+          <span className="w-4 h-4 mr-2 rounded-full bg-yellow-400 inline-block" />
+          Documentation
+        </button>
       </div>
     </div>
   );
