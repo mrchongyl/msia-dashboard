@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from 'react-query';
-import { ExternalLink, BarChart, DollarSign, TrendingUp, CreditCard, Percent, Wifi } from 'lucide-react';
+import { ExternalLink, BarChart, DollarSign, TrendingUp, CreditCard, Percent, Wifi, CircleDollarSign } from 'lucide-react';
 import { fetchGdpPerCapita, fetchCreditCardUsage, fetchInflation, fetchCpi, fetchMobileInternetBanking } from '../../services/apiService';
 import { GdpDataSummary } from '../../types/gdpTypes';
 import { calculateGdpSummary } from '../../utils/dataUtils';
@@ -228,7 +228,48 @@ const OverviewTab: React.FC = () => {
                 Annual gross domestic product per person in current US dollars from {gdpSummary?.startYear} to {gdpSummary?.endYear}.
               </p>
               <a 
-                href="https://data.worldbank.org/indicator/NY.GDP.PCAP.CD?locations=MY" 
+                href="https://data360.worldbank.org/en/indicator/WB_WDI_NY_GDP_PCAP_CD" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-sm text-blue-600 hover:text-blue-800 flex items-center"
+              >
+                View on World Bank <ExternalLink className="h-3 w-3 ml-1" />
+              </a>
+            </div>
+          </li>
+          {/* Annual Inflation Rate Dataset */}
+          <li className="flex items-start">
+            <div className="rounded-full bg-blue-100 p-2 mr-3">
+              <Percent className="h-4 w-4 text-purple-600" />
+            </div>
+            <div>
+              <h4 className="font-medium text-slate-800">Inflation, consumer prices (annual % growth)</h4>
+              <p className="text-sm text-slate-600 mb-2">
+                Annual inflation rate (CPI, %) from {gdpSummary?.startYear} to {gdpSummary?.endYear}.
+              </p>
+              <a 
+                href="https://data360.worldbank.org/en/indicator/WB_WDI_FP_CPI_TOTL_ZG" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-sm text-blue-600 hover:text-blue-800 flex items-center"
+              >
+                View on World Bank <ExternalLink className="h-3 w-3 ml-1" />
+              </a>
+            </div>
+          </li>
+          {/* Consumer Price Index (CPI) Dataset */}
+          <li className="flex items-start">
+            <div className="rounded-full bg-blue-100 p-2 mr-3">
+              <CircleDollarSign className="h-4 w-4 text-orange-600" />
+            </div>
+            <div>
+              <h4 className="font-medium text-slate-800">Consumer price index (2010 = 100)
+</h4>
+              <p className="text-sm text-slate-600 mb-2">
+                Annual Consumer Price Index (CPI) from {gdpSummary?.startYear} to {gdpSummary?.endYear}.
+              </p>
+              <a 
+                href="https://data360.worldbank.org/en/indicator/WB_WDI_FP_CPI_TOTL" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-sm text-blue-600 hover:text-blue-800 flex items-center"
@@ -240,15 +281,35 @@ const OverviewTab: React.FC = () => {
           {/* Credit Card Usage Dataset */}
           <li className="flex items-start">
             <div className="rounded-full bg-blue-100 p-2 mr-3">
-              <TrendingUp className="h-4 w-4 text-blue-600" />
+              <CreditCard className="h-4 w-4 text-green-600" />
             </div>
             <div>
-              <h4 className="font-medium text-slate-800">GDP Per Capita (current US$)</h4>
+              <h4 className="font-medium text-slate-800">Use of Financial Services, Credit cards</h4>
+              <p className="text-sm text-slate-600 mb-2">
+                Annual number of credit card usage from {gdpSummary?.startYear} to {gdpSummary?.endYear}.
+              </p>
+              <a 
+                href="https://data360.worldbank.org/en/indicator/IMF_FAS_FCCCC" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-sm text-blue-600 hover:text-blue-800 flex items-center"
+              >
+                View on World Bank <ExternalLink className="h-3 w-3 ml-1" />
+              </a>
+            </div>
+          </li>
+          {/* Mobile & Internet Banking Dataset */}
+          <li className="flex items-start">
+            <div className="rounded-full bg-blue-100 p-2 mr-3">
+              <Wifi className="h-4 w-4 text-red-600" />
+            </div>
+            <div>
+              <h4 className="font-medium text-slate-800">Use of Financial Services, Mobile and internet banking transactions (during the reference year, for commercial banks only)</h4>
               <p className="text-sm text-slate-600 mb-2">
                 Annual gross domestic product per person in current US dollars from {gdpSummary?.startYear} to {gdpSummary?.endYear}.
               </p>
               <a 
-                href="https://data.worldbank.org/indicator/NY.GDP.PCAP.CD?locations=MY" 
+                href="https://data360.worldbank.org/en/indicator/IMF_FAS_FCMIBT?view=trend" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-sm text-blue-600 hover:text-blue-800 flex items-center"
