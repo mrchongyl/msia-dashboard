@@ -7,12 +7,29 @@ import Table, { TableColumn } from '../visualizations/Table';
 import LoadingSpinner from '../ui/LoadingSpinner';
 import ErrorMessage from '../ui/ErrorMessage';
 import { CreditCardUsageItem, TimeRange } from '../../types/gdpTypes';
-import { calculateGdpSummary, formatCurrency } from '../../utils/dataUtils';
 
 const unitOptions = [
   { value: 'ACCT', label: 'Number of Accounts' },
   { value: '10P3AD', label: 'Per 10,000 Adults' },
 ];
+
+function calculateCreditCardSummary(data: CreditCardUsageItem[]) {
+  if (!data || data.length === 0) return null;
+  const sorted = [...data].sort((a, b) => parseInt(a.year) - parseInt(b.year));
+  const startYear = sorted[0].year;
+  const endYear = sorted[sorted.length - 1].year;
+  const latest = sorted[sorted.length - 1].value;
+  const growthSince2000 = (() => {
+    const base = sorted.find(item => parseInt(item.year) === 2000);
+    if (base) {
+      return ((latest - base.value) / base.value) * 100;
+    } else {
+      return ((latest - sorted[0].value) / sorted[0].value) * 100;
+    }
+  })();
+  const peak = sorted.reduce((max, item) => item.value > max.value ? item : max, sorted[0]);
+  return { startYear, endYear, latest, growthSince2000, peak };
+}
 
 const CreditCardUsageTab: React.FC = () => {
   const [timeRange, setTimeRange] = useState<TimeRange>('all');
@@ -40,7 +57,7 @@ const CreditCardUsageTab: React.FC = () => {
 
   const filteredData = data ? getFilteredData() : [];
   // Calculate summary using only filtered data for the selected unit
-  const summary = filteredData.length > 0 ? calculateGdpSummary(filteredData) : null;
+  const summary = filteredData.length > 0 ? calculateCreditCardSummary(filteredData) : null;
 
   // Generate CSV from data
   const generateCsv = () => {
@@ -81,9 +98,10 @@ const CreditCardUsageTab: React.FC = () => {
             <CreditCard className="mr-2 h-6 w-6 text-green-600" />
             Credit Card Usage (Count)
           </h2>
-          <p className="text-slate-600 mt-1">
-            Annual number of credit card usage in Malaysia
-          </p>
+            <p className="text-slate-600 mt-1">
+            Annual number of credit card usage in Malaysia.<br />
+            This dashboard provides insights into Malaysia's Annual credit card usage number from {summary?.startYear} to {summary?.endYear}.
+            </p>
         </div>
         <div className="mt-4 md:mt-0 flex flex-wrap gap-2">
           <select

@@ -7,7 +7,24 @@ import Table, { TableColumn } from '../visualizations/Table';
 import LoadingSpinner from '../ui/LoadingSpinner';
 import ErrorMessage from '../ui/ErrorMessage';
 import { InflationDataItem, TimeRange } from '../../types/gdpTypes';
-import { calculateGdpSummary } from '../../utils/dataUtils';
+
+function calculateInflationSummary(data: InflationDataItem[]) {
+  if (!data || data.length === 0) return null;
+  const sorted = [...data].sort((a, b) => parseInt(a.year) - parseInt(b.year));
+  const startYear = sorted[0].year;
+  const endYear = sorted[sorted.length - 1].year;
+  const latest = sorted[sorted.length - 1].value;
+  const growthSince2000 = (() => {
+    const base = sorted.find(item => parseInt(item.year) === 2000);
+    if (base) {
+      return latest - base.value;
+    } else {
+      return latest - sorted[0].value;
+    }
+  })();
+  const peak = sorted.reduce((max, item) => item.value > max.value ? item : max, sorted[0]);
+  return { startYear, endYear, latest, growthSince2000, peak };
+}
 
 const InflationTab: React.FC = () => {
   const [timeRange, setTimeRange] = useState<TimeRange>('all');
@@ -31,7 +48,7 @@ const InflationTab: React.FC = () => {
   };
 
   const filteredData = data ? getFilteredData() : [];
-  const summary = filteredData.length > 0 ? calculateGdpSummary(filteredData) : null;
+  const summary = filteredData.length > 0 ? calculateInflationSummary(filteredData) : null;
 
   // Generate CSV from data
   const generateCsv = () => {
@@ -73,7 +90,8 @@ const InflationTab: React.FC = () => {
             Inflation Rate (Annual %)
           </h2>
           <p className="text-slate-600 mt-1">
-            Annual inflation rate (CPI, %) for Malaysia
+            Annual inflation rate (CPI, %) for Malaysia.
+            This dashboard provides insights into Malaysia's Annual inflation rate measurements from {summary?.startYear} to {summary?.endYear}.
           </p>
         </div>
         <div className="mt-4 md:mt-0 flex flex-wrap gap-2">

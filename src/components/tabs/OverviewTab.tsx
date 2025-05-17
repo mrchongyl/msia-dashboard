@@ -1,11 +1,12 @@
 import React from 'react';
 import { useQuery } from 'react-query';
-import { ExternalLink, BarChart, DollarSign, TrendingUp } from 'lucide-react';
+import { ExternalLink, BarChart, DollarSign, TrendingUp, CreditCard, Percent, Wifi } from 'lucide-react';
 import { fetchGdpPerCapita, fetchCreditCardUsage, fetchInflation, fetchCpi, fetchMobileInternetBanking } from '../../services/apiService';
 import { GdpDataSummary } from '../../types/gdpTypes';
 import { calculateGdpSummary } from '../../utils/dataUtils';
 import LoadingSpinner from '../ui/LoadingSpinner';
 import ErrorMessage from '../ui/ErrorMessage';
+import StackedComparisonChart from '../visualizations/StackedComparisonChart';
 
 const OverviewTab: React.FC = () => {
   // GDP per Capita
@@ -48,23 +49,21 @@ const OverviewTab: React.FC = () => {
     : null;
 
   if (isLoading) return <LoadingSpinner />;
-  if (error) return <ErrorMessage message="Failed to load GDP data" />;
+  if (error) return <ErrorMessage message="Failed to load data" />;
 
   return (
     <div className="slide-in">
-      <div className="mb-8">
+      <div className="mb-8 flex flex-col w-full">
         <h2 className="text-2xl font-bold text-slate-800 mb-4">
           Malaysia Economic Overview
         </h2>
-        <p className="text-slate-600 max-w-3xl">
-          Explore key economic indicators for Malaysia sourced from the World Bank. This dashboard
-          provides insights into Malaysia's economic performance over time, with a focus on GDP per capita
-          measurements from {gdpSummary?.startYear} to {gdpSummary?.endYear}.
+        <p className="text-slate-600 w-full">
+         Gain insights into Malaysia’s economic landscape through key indicators from the World Bank. This dashboard presents data on GDP per capita, inflation trends, and consumer prices, along with the use of financial services such as credit card adoption and mobile or internet banking transactions by commercial banks. Explore the data to understand the economic growth and financial behavior of Malaysia over the years.
         </p>
       </div>
 
       {averageGdp !== null && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-8">
+        <div className="grid w-full grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-8">
           {/* GDP Card */}
           <div className="card p-6">
             <div className="flex items-start">
@@ -84,7 +83,7 @@ const OverviewTab: React.FC = () => {
           <div className="card p-6">
             <div className="flex items-start">
               <div className="rounded-full bg-green-100 p-3 mr-4">
-                <TrendingUp className="h-6 w-6 text-green-600" />
+                <CreditCard className="h-6 w-6 text-green-600" />
               </div>
               <div>
                 <h3 className="text-sm font-medium text-slate-500">Avg Credit Card Usage / 1,000 Adults</h3>
@@ -99,7 +98,7 @@ const OverviewTab: React.FC = () => {
           <div className="card p-6">
             <div className="flex items-start">
               <div className="rounded-full bg-purple-100 p-3 mr-4">
-                <BarChart className="h-6 w-6 text-purple-600" />
+                <Percent className="h-6 w-6 text-purple-600" />
               </div>
               <div>
                 <h3 className="text-sm font-medium text-slate-500">Avg Yearly Inflation Increase</h3>
@@ -129,7 +128,7 @@ const OverviewTab: React.FC = () => {
           <div className="card p-6">
             <div className="flex items-start">
               <div className="rounded-full bg-red-100 p-3 mr-4">
-                <BarChart className="h-6 w-6 text-red-500" />
+                <Wifi className="h-6 w-6 text-red-500" />
               </div>
               <div>
                 <h3 className="text-sm font-medium text-slate-500">Avg Mobile & Internet Banking / 1,000 Adults</h3>
@@ -143,9 +142,42 @@ const OverviewTab: React.FC = () => {
         </div>
       )}
 
+      {/* Stacked/Comparison Chart Section */}
+      <div className="card p-6 mb-8">
+        <h3 className="text-lg font-medium text-slate-800 mb-4">Compare Key Economic Indicators</h3>
+        <StackedComparisonChart
+          gdpData={gdpData}
+          creditCardData={creditCardData}
+          inflationData={inflationData}
+          cpiData={cpiData}
+          mibData={mibData}
+        />
+      </div>
+
       <div className="card p-6">
         <h3 className="text-lg font-medium text-slate-800 mb-4">Available Datasets</h3>
         <ul className="space-y-4">
+          {/* GDP Per Capita Dataset */}
+          <li className="flex items-start">
+            <div className="rounded-full bg-blue-100 p-2 mr-3">
+              <TrendingUp className="h-4 w-4 text-blue-600" />
+            </div>
+            <div>
+              <h4 className="font-medium text-slate-800">GDP Per Capita (current US$)</h4>
+              <p className="text-sm text-slate-600 mb-2">
+                Annual gross domestic product per person in current US dollars from {gdpSummary?.startYear} to {gdpSummary?.endYear}.
+              </p>
+              <a 
+                href="https://data.worldbank.org/indicator/NY.GDP.PCAP.CD?locations=MY" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-sm text-blue-600 hover:text-blue-800 flex items-center"
+              >
+                View on World Bank <ExternalLink className="h-3 w-3 ml-1" />
+              </a>
+            </div>
+          </li>
+          {/* Credit Card Usage Dataset */}
           <li className="flex items-start">
             <div className="rounded-full bg-blue-100 p-2 mr-3">
               <TrendingUp className="h-4 w-4 text-blue-600" />

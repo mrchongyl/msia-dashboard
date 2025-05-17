@@ -85,7 +85,8 @@ const GdpTab: React.FC = () => {
             GDP Per Capita (current US$)
           </h2>
           <p className="text-slate-600 mt-1">
-            Annual GDP per capita in current US dollars for Malaysia
+            Annual GDP per capita in current US dollars for Malaysia. <br />
+            This dashboard provides insights into Malaysia's GDP per capita measurements from {gdpSummary?.startYear} to {gdpSummary?.endYear}.
           </p>
         </div>
 

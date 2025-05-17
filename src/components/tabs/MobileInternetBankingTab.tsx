@@ -82,7 +82,8 @@ const MobileInternetBankingTab: React.FC = () => {
             Mobile & Internet Banking
           </h2>
           <p className="text-slate-600 mt-1">
-            Annual Mobile & Internet Banking data for Malaysia
+            Annual Mobile & Internet Banking data for Malaysia.<br />
+            This dashboard provides insights into Malaysia's  Annual Mobile & Internet Banking data from {summary?.startYear} to {summary?.endYear}.
           </p>
         </div>
         <div className="mt-4 md:mt-0 flex flex-wrap gap-2">

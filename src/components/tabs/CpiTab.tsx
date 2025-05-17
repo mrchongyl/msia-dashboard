@@ -1,13 +1,30 @@
 import React, { useState } from 'react';
 import { useQuery } from 'react-query';
-import { TrendingUp, Download, BarChart, CircleDollarSign } from 'lucide-react';
+import { TrendingUp, Download, BarChart } from 'lucide-react';
 import { fetchCpi } from '../../services/apiService';
 import LineChart from '../visualizations/LineChart';
 import Table, { TableColumn } from '../visualizations/Table';
 import LoadingSpinner from '../ui/LoadingSpinner';
 import ErrorMessage from '../ui/ErrorMessage';
 import { CpiDataItem, TimeRange } from '../../types/gdpTypes';
-import { calculateGdpSummary } from '../../utils/dataUtils';
+
+function calculateCpiSummary(data: CpiDataItem[]) {
+  if (!data || data.length === 0) return null;
+  const sorted = [...data].sort((a, b) => parseInt(a.year) - parseInt(b.year));
+  const startYear = sorted[0].year;
+  const endYear = sorted[sorted.length - 1].year;
+  const latest = sorted[sorted.length - 1].value;
+  const growthSince2000 = (() => {
+    const base = sorted.find(item => parseInt(item.year) === 2000);
+    if (base) {
+      return latest - base.value;
+    } else {
+      return latest - sorted[0].value;
+    }
+  })();
+  const peak = sorted.reduce((max, item) => item.value > max.value ? item : max, sorted[0]);
+  return { startYear, endYear, latest, growthSince2000, peak };
+}
 
 const CpiTab: React.FC = () => {
   const [timeRange, setTimeRange] = useState<TimeRange>('all');
@@ -31,12 +48,12 @@ const CpiTab: React.FC = () => {
   };
 
   const filteredData = data ? getFilteredData() : [];
-  const summary = filteredData.length > 0 ? calculateGdpSummary(filteredData) : null;
+  const summary = filteredData.length > 0 ? calculateCpiSummary(filteredData) : null;
 
   // Generate CSV from data
   const generateCsv = () => {
     if (!data) return;
-    const headers = ['Year', 'Consumer Price Index (CPI'];
+    const headers = ['Year', 'CPI Value'];
     const csvRows = [
       headers.join(','),
       ...filteredData.map(item => `${item.year},${item.value}`)
@@ -58,7 +75,7 @@ const CpiTab: React.FC = () => {
   // Prepare columns for table
   const columns: TableColumn<CpiDataItem>[] = [
     { key: 'year', label: 'Year', align: 'left' },
-    { key: 'value', label: 'CPI', align: 'right', formatter: (v) => v.toFixed(2) },
+    { key: 'value', label: 'CPI Value', align: 'right', formatter: (v) => v.toFixed(2) },
   ];
 
   if (isLoading) return <LoadingSpinner />;
@@ -69,11 +86,12 @@ const CpiTab: React.FC = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
         <div>
           <h2 className="text-2xl font-bold text-slate-800 flex items-center">
-            <CircleDollarSign className="mr-2 h-6 w-6 text-orange-500" />
-            Consumer Price Index (CPI) (2010 = 100)
+            <BarChart className="mr-2 h-6 w-6 text-orange-500" />
+            Consumer Price Index (CPI)
           </h2>
           <p className="text-slate-600 mt-1">
-            Annual Consumer Price Index (CPI) for Malaysia
+            Annual Consumer Price Index (CPI) for Malaysia. <br />
+            This dashboard provides insights into Malaysia's CPI measurements from {summary?.startYear} to {summary?.endYear}.
           </p>
         </div>
         <div className="mt-4 md:mt-0 flex flex-wrap gap-2">
@@ -103,10 +121,10 @@ const CpiTab: React.FC = () => {
           <div className="card p-6">
             <div className="flex items-start">
               <div className="rounded-full bg-orange-100 p-3 mr-4">
-                <CircleDollarSign className="h-6 w-6 text-orange-500" />
+                <BarChart className="h-6 w-6 text-orange-500" />
               </div>
               <div>
-                <h3 className="text-sm font-medium text-slate-500">Latest CPI</h3>
+                <h3 className="text-sm font-medium text-slate-500">Latest CPI Value</h3>
                 <p className="text-2xl font-semibold number-mono text-slate-800">
                   {summary.latest.toFixed(2)}
                 </p>
@@ -122,7 +140,7 @@ const CpiTab: React.FC = () => {
               <div>
                 <h3 className="text-sm font-medium text-slate-500">Growth Since {summary.startYear}</h3>
                 <p className="text-2xl font-semibold number-mono text-slate-800">
-                  {summary.growthSince2000.toFixed(2)}%
+                  {summary.growthSince2000.toFixed(2)}
                 </p>
                 <p className="text-xs text-slate-500">{summary.startYear} - {summary.endYear}</p>
               </div>
@@ -149,9 +167,9 @@ const CpiTab: React.FC = () => {
       <div className="card p-6 mb-8">
         <LineChart
           data={chartData}
-          label="CPI"
+          label="CPI Value"
           color="rgb(251,146,60)"
-          yAxisLabel="CPI"
+          yAxisLabel="CPI Value"
           valueFormatter={(v) => v.toFixed(2)}
         />
       </div>
