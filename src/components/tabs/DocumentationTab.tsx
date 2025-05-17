@@ -1,15 +1,14 @@
 import React from 'react';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, FileCog } from 'lucide-react';
 
 const DocumentationTab: React.FC = () => {
   return (
     <div className="slide-in">
-      {/* Header and description, single column, left-aligned like other tabs */}
       <div className="w-full mb-6">
-        <h2 className="text-2xl font-bold text-slate-800 flex items-center mb-2">
-          <span className="inline-block w-3 h-3 rounded-full bg-yellow-600 mr-2" />
-          Project Documentation
-        </h2>
+        <div className="flex items-center mb-2">
+          <FileCog className="h-6 w-6 text-yellow-600 mr-2" />
+          <h2 className="text-2xl font-bold text-slate-800 flex items-center">Documentation</h2>
+        </div>
         <p className="text-slate-600">
           This documentation provides an overview of the architecture, API integrations, and CI/CD pipeline for the Malaysia Economic Dashboard.
         </p>

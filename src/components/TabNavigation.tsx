@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, TrendingUp, CreditCard, Percent, CircleDollarSign, Wifi } from 'lucide-react';
+import { Home, TrendingUp, CreditCard, Percent, CircleDollarSign, Wifi, FileCog } from 'lucide-react';
 import { TabType } from '../App';
 
 interface TabNavigationProps {
@@ -71,7 +71,7 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, setActiveTab }
           }`}
           onClick={() => setActiveTab('documentation' as TabType)}
         >
-          <span className="w-4 h-4 mr-2 rounded-full bg-yellow-400 inline-block" />
+          <FileCog className="h-4 w-4 mr-2 text-yellow-500" />
           Documentation
         </button>
       </div>
