@@ -36,14 +36,14 @@ const OverviewTab: React.FC = () => {
     ? (cpiData[cpiData.length - 1].value - cpiData[0].value) / (cpiData.length - 1)
     : null;
 
-  // Credit Card Usage (per 1,000 adults, 10P3AD only)
+  // Credit Card Usage (per 1,000 adults)
   const { data: creditCardData } = useQuery(['creditCardUsage', '10P3AD'], () => fetchCreditCardUsage('10P3AD'));
   const creditCard10P3AD = creditCardData?.filter(d => d.unit === '10P3AD') || [];
   const avgCreditCard = creditCard10P3AD.length > 0
     ? creditCard10P3AD.reduce((sum, item) => sum + item.value, 0) / creditCard10P3AD.length
     : null;
 
-  // Mobile & Internet Banking (per 1,000 adults, 10P3AD only)
+  // Mobile & Internet Banking (per 1,000 adults)
   const { data: mibData } = useQuery(['mobileInternetBanking', '10P3AD'], () => fetchMobileInternetBanking('10P3AD'));
   const mib10P3AD = mibData?.filter(d => d.unit === '10P3AD') || [];
   const avgMib = mib10P3AD.length > 0
@@ -236,14 +236,14 @@ const OverviewTab: React.FC = () => {
               The Consumer Price Index (CPI) increased from <b>{cpiData[0].value.toFixed(2)}</b> in {cpiData[0].year} to <b>{cpiData[cpiData.length-1].value.toFixed(2)}</b> in {cpiData[cpiData.length-1].year}, a total increase of <b>{(((cpiData[cpiData.length-1].value - cpiData[0].value) / cpiData[0].value) * 100).toFixed(1)}%</b>.
             </li>
           )}
-          {creditCardData && creditCardData.length > 1 && (
+          {creditCard10P3AD && creditCard10P3AD.length > 1 && (
             <li>
-              Credit card usage <b>per 1,000 adults</b> ranged from <b>{Math.min(...creditCardData.map(d => d.value)).toFixed(2)}</b> to <b>{Math.max(...creditCardData.map(d => d.value)).toFixed(2)}</b> over the available years.
+              Credit card usage <b>per 1,000 adults</b> ranged from <b>{Math.min(...creditCard10P3AD.map(d => d.value)).toFixed(2)}</b> to <b>{Math.max(...creditCard10P3AD.map(d => d.value)).toFixed(2)}</b> over the available years.
             </li>
           )}
-          {mibData && mibData.length > 1 && (
+          {mib10P3AD && mib10P3AD.length > 1 && (
             <li>
-              Mobile & Internet banking usage <b>per 1,000 adults</b> ranged from <b>{Math.min(...mibData.map(d => d.value)).toFixed(2)}</b> to <b>{Math.max(...mibData.map(d => d.value)).toFixed(2)}</b> over the available years.
+              Mobile & Internet banking usage <b>per 1,000 adults</b> ranged from <b>{Math.min(...mib10P3AD.map(d => d.value)).toFixed(2)}</b> to <b>{Math.max(...mib10P3AD.map(d => d.value)).toFixed(2)}</b> over the available years.
             </li>
           )}
         </ul>
@@ -261,6 +261,8 @@ const OverviewTab: React.FC = () => {
               <h4 className="font-medium text-slate-800">GDP Per Capita (current US$)</h4>
               <p className="text-sm text-slate-600 mb-2">
                 Annual gross domestic product per person in current US dollars from {gdpSummary?.startYear} to {gdpSummary?.endYear}.
+                <br />
+                <span className="text-xs text-slate-500">Frequency: Annual. Last updated: {gdpData?.[gdpData.length-1]?.year || '--'}. {gdpData && gdpData.length > 1 && (gdpData[gdpData.length-1].year - gdpData[0].year + 1 !== gdpData.length ? 'Note: Some years may be missing.' : 'No missing years detected.')}</span>
               </p>
               <a 
                 href="https://data360.worldbank.org/en/indicator/WB_WDI_NY_GDP_PCAP_CD" 
@@ -280,7 +282,9 @@ const OverviewTab: React.FC = () => {
             <div>
               <h4 className="font-medium text-slate-800">Inflation, consumer prices (annual % growth)</h4>
               <p className="text-sm text-slate-600 mb-2">
-                Annual inflation rate (CPI, %) from {gdpSummary?.startYear} to {gdpSummary?.endYear}.
+                Annual inflation rate (CPI, %) from {inflationData?.[0]?.year} to {inflationData?.[inflationData.length-1]?.year}.
+                <br />
+                <span className="text-xs text-slate-500">Frequency: Annual. Last updated: {inflationData?.[inflationData.length-1]?.year || '--'}. {inflationData && inflationData.length > 1 && (inflationData[inflationData.length-1].year - inflationData[0].year + 1 !== inflationData.length ? 'Note: Some years may be missing.' : 'No missing years detected.')}</span>
               </p>
               <a 
                 href="https://data360.worldbank.org/en/indicator/WB_WDI_FP_CPI_TOTL_ZG" 
@@ -301,7 +305,9 @@ const OverviewTab: React.FC = () => {
               <h4 className="font-medium text-slate-800">Consumer price index (2010 = 100)
 </h4>
               <p className="text-sm text-slate-600 mb-2">
-                Annual Consumer Price Index (CPI) from {gdpSummary?.startYear} to {gdpSummary?.endYear}.
+                Annual Consumer Price Index (CPI) from {cpiData?.[0]?.year} to {cpiData?.[cpiData.length-1]?.year}.
+                <br />
+                <span className="text-xs text-slate-500">Frequency: Annual. Last updated: {cpiData?.[cpiData.length-1]?.year || '--'}. {cpiData && cpiData.length > 1 && (cpiData[cpiData.length-1].year - cpiData[0].year + 1 !== cpiData.length ? 'Note: Some years may be missing.' : 'No missing years detected.')}</span>
               </p>
               <a 
                 href="https://data360.worldbank.org/en/indicator/WB_WDI_FP_CPI_TOTL" 
@@ -321,7 +327,9 @@ const OverviewTab: React.FC = () => {
             <div>
               <h4 className="font-medium text-slate-800">Use of Financial Services, Credit cards</h4>
               <p className="text-sm text-slate-600 mb-2">
-                Annual number of credit card usage from {creditCardData?.[0]?.year} to {creditCardData?.[creditCardData.length-1]?.year}.
+                Annual number of credit card usage from {creditCard10P3AD[0]?.year} to {creditCard10P3AD[creditCard10P3AD.length-1]?.year}.
+                <br />
+                <span className="text-xs text-slate-500">Frequency: Annual. Last updated: {creditCard10P3AD[creditCard10P3AD.length-1]?.year || '--'}. {creditCard10P3AD && creditCard10P3AD.length > 1 && (creditCard10P3AD[creditCard10P3AD.length-1].year - creditCard10P3AD[0].year + 1 !== creditCard10P3AD.length ? 'Note: Some years may be missing.' : 'No missing years detected.')}</span>
               </p>
               <a 
                 href="https://data360.worldbank.org/en/indicator/IMF_FAS_FCCCC" 
@@ -342,6 +350,8 @@ const OverviewTab: React.FC = () => {
               <h4 className="font-medium text-slate-800">Use of Financial Services, Mobile and internet banking transactions (during the reference year, for commercial banks only)</h4>
               <p className="text-sm text-slate-600 mb-2">
                 Annual number of mobile and internet banking transactions from {mib10P3AD[0]?.year} to {mib10P3AD[mib10P3AD.length-1]?.year}.
+                <br />
+                <span className="text-xs text-slate-500">Frequency: Annual. Last updated: {mib10P3AD[mib10P3AD.length-1]?.year || '--'}. {mib10P3AD && mib10P3AD.length > 1 && (mib10P3AD[mib10P3AD.length-1].year - mib10P3AD[0].year + 1 !== mib10P3AD.length ? 'Note: Some years may be missing.' : 'No missing years detected.')}</span>
               </p>
               <a 
                 href="https://data360.worldbank.org/en/indicator/IMF_FAS_FCMIBT?view=trend" 
