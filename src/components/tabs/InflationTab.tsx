@@ -7,6 +7,8 @@ import Table, { TableColumn } from '../visualizations/Table';
 import LoadingSpinner from '../ui/LoadingSpinner';
 import ErrorMessage from '../ui/ErrorMessage';
 import { InflationDataItem, TimeRange } from '../../types/gdpTypes';
+import * as ss from 'simple-statistics';
+import regression from 'regression';
 
 function calculateInflationSummary(data: InflationDataItem[]) {
   if (!data || data.length === 0) return null;
@@ -78,6 +80,18 @@ const InflationTab: React.FC = () => {
     { key: 'value', label: 'Inflation Rate (%)', align: 'right', formatter: (v) => v.toFixed(2) + '%' },
   ];
 
+  // Statistical analysis
+  const values = filteredData.map(d => d.value);
+  const years = filteredData.map(d => +d.year);
+  const mean = values.length ? ss.mean(values) : null;
+  const median = values.length ? ss.median(values) : null;
+  const stddev = values.length ? ss.standardDeviation(values) : null;
+  const regData = filteredData.map(d => [+d.year, d.value]);
+  const regResult = regData.length > 1 ? regression.linear(regData) : null;
+  const slope = regResult ? regResult.equation[0] : null;
+  const intercept = regResult ? regResult.equation[1] : null;
+  const r2 = regResult ? regResult.r2 : null;
+
   if (isLoading) return <LoadingSpinner />;
   if (error) return <ErrorMessage message="Failed to load inflation data" />;
 
@@ -90,7 +104,7 @@ const InflationTab: React.FC = () => {
             Inflation Rate (Annual %)
           </h2>
           <p className="text-slate-600 mt-1">
-            Annual inflation rate (CPI, %) for Malaysia.
+            Annual inflation rate (CPI, %) for Malaysia. <br />
             This dashboard provides insights into Malaysia's Annual inflation rate measurements from {summary?.startYear} to {summary?.endYear}.
           </p>
         </div>
@@ -172,6 +186,17 @@ const InflationTab: React.FC = () => {
           yAxisLabel="Inflation Rate (%)"
           valueFormatter={(v) => v.toFixed(2) + '%'}
         />
+      </div>
+
+      {/* Statistical Analysis Section */}
+      <div className="card p-6 mb-8">
+        <h3 className="text-lg font-medium text-slate-800 mb-2">Statistical Analysis</h3>
+        <ul className="text-slate-700 text-sm mb-2">
+          <li>Mean: {mean !== null ? mean.toFixed(2) + '%' : '--'}</li>
+          <li>Median: {median !== null ? median.toFixed(2) + '%' : '--'}</li>
+          <li>Std Dev: {stddev !== null ? stddev.toFixed(2) + '%' : '--'}</li>
+          <li>Linear Regression: {slope !== null && intercept !== null ? `y = ${slope.toFixed(4)}x + ${intercept.toFixed(2)}` : '--'} {r2 !== null ? `(R² = ${r2.toFixed(3)})` : ''}</li>
+        </ul>
       </div>
 
       {/* Table Section */}

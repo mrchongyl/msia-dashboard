@@ -7,6 +7,8 @@ import Table, { TableColumn } from '../visualizations/Table';
 import LoadingSpinner from '../ui/LoadingSpinner';
 import ErrorMessage from '../ui/ErrorMessage';
 import { CreditCardUsageItem, TimeRange } from '../../types/gdpTypes';
+import * as ss from 'simple-statistics';
+import regression from 'regression';
 
 const unitOptions = [
   { value: 'ACCT', label: 'Number of Accounts' },
@@ -86,6 +88,17 @@ const CreditCardUsageTab: React.FC = () => {
     { key: 'year', label: 'Year', align: 'left' },
     { key: 'value', label: 'Credit Card Usage', align: 'right', formatter: (v) => v.toLocaleString('en-US') },
   ];
+
+  // Statistical analysis
+  const values = filteredData.map(d => d.value);
+  const mean = values.length ? ss.mean(values) : null;
+  const median = values.length ? ss.median(values) : null;
+  const stddev = values.length ? ss.standardDeviation(values) : null;
+  const regData = filteredData.map(d => [+d.year, d.value]);
+  const regResult = regData.length > 1 ? regression.linear(regData) : null;
+  const slope = regResult ? regResult.equation[0] : null;
+  const intercept = regResult ? regResult.equation[1] : null;
+  const r2 = regResult ? regResult.r2 : null;
 
   if (isLoading) return <LoadingSpinner />;
   if (error) return <ErrorMessage message="Failed to load credit card usage data" />;
@@ -190,6 +203,17 @@ const CreditCardUsageTab: React.FC = () => {
           yAxisLabel="Credit Card Usage (Count)"
           valueFormatter={(v) => v.toLocaleString('en-US')}
         />
+      </div>
+
+      {/* Statistical Analysis Section */}
+      <div className="card p-6 mb-8">
+        <h3 className="text-lg font-medium text-slate-800 mb-2">Statistical Analysis</h3>
+        <ul className="text-slate-700 text-sm mb-2">
+          <li>Mean: {mean !== null ? mean.toLocaleString('en-US', { maximumFractionDigits: 2 }) : '--'}</li>
+          <li>Median: {median !== null ? median.toLocaleString('en-US', { maximumFractionDigits: 2 }) : '--'}</li>
+          <li>Std Dev: {stddev !== null ? stddev.toLocaleString('en-US', { maximumFractionDigits: 2 }) : '--'}</li>
+          <li>Linear Regression: {slope !== null && intercept !== null ? `y = ${slope.toFixed(4)}x + ${intercept.toFixed(2)}` : '--'} {r2 !== null ? `(R² = ${r2.toFixed(3)})` : ''}</li>
+        </ul>
       </div>
 
       {/* Table Section */}
