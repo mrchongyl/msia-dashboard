@@ -11,12 +11,14 @@ interface TableProps<T> {
   columns: TableColumn<T>[];
   data: T[];
   rowsPerPage?: number;
+  title?: string;
 }
 
-function Table<T extends { [key: string]: any }>({ columns, data, rowsPerPage = 10 }: TableProps<T>) {
+function Table<T extends { [key: string]: any }>({ columns, data, rowsPerPage = 10, title }: TableProps<T>) {
   const [sortField, setSortField] = useState<keyof T>(columns[0].key);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [currentPage, setCurrentPage] = useState(1);
+  const [search, setSearch] = useState('');
 
   // Handle sort
   const handleSort = (field: keyof T) => {
@@ -47,6 +49,17 @@ function Table<T extends { [key: string]: any }>({ columns, data, rowsPerPage = 
 
   return (
     <div>
+      <div className="flex flex-row-reverse items-center justify-between px-4 pt-4 pb-2 mb-2 bg-slate-50 rounded-t-lg border-b border-slate-200">
+        <input
+          type="text"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Search..."
+          className="px-4 py-2 border border-slate-300 rounded-lg shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white ml-2"
+          style={{ minWidth: 220, marginBottom: 0 }}
+        />
+        {title && <h3 className="text-lg font-semibold text-slate-800 mr-auto">{title}</h3>}
+      </div>
       <div className="overflow-x-auto">
         <table className="w-full divide-y divide-slate-200">
           <thead>

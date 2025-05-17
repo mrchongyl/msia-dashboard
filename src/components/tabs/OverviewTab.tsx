@@ -6,7 +6,6 @@ import { GdpDataSummary } from '../../types/gdpTypes';
 import { calculateGdpSummary } from '../../utils/dataUtils';
 import LoadingSpinner from '../ui/LoadingSpinner';
 import ErrorMessage from '../ui/ErrorMessage';
-import StackedComparisonChart from '../visualizations/StackedComparisonChart';
 
 const OverviewTab: React.FC = () => {
   // GDP per Capita
@@ -141,18 +140,6 @@ const OverviewTab: React.FC = () => {
           </div>
         </div>
       )}
-
-      {/* Stacked/Comparison Chart Section */}
-      <div className="card p-6 mb-8">
-        <h3 className="text-lg font-medium text-slate-800 mb-4">Compare Key Economic Indicators</h3>
-        <StackedComparisonChart
-          gdpData={gdpData}
-          creditCardData={creditCardData}
-          inflationData={inflationData}
-          cpiData={cpiData}
-          mibData={mibData}
-        />
-      </div>
 
       <div className="card p-6">
         <h3 className="text-lg font-medium text-slate-800 mb-4">Available Datasets</h3>
