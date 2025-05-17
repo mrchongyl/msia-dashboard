@@ -1,24 +1,19 @@
 import React from 'react';
 import { useQuery } from 'react-query';
 import { ExternalLink, BarChart, DollarSign, TrendingUp } from 'lucide-react';
-import { fetchGdpPerCapita } from '../../services/apiService';
+import { fetchGdpPerCapita, fetchCreditCardUsage, fetchInflation, fetchCpi, fetchMobileInternetBanking } from '../../services/apiService';
 import { GdpDataSummary } from '../../types/gdpTypes';
 import { calculateGdpSummary } from '../../utils/dataUtils';
 import LoadingSpinner from '../ui/LoadingSpinner';
 import ErrorMessage from '../ui/ErrorMessage';
 
 const OverviewTab: React.FC = () => {
-  const { data, isLoading, error } = useQuery('gdpPerCapita', fetchGdpPerCapita);
-  
-  // Calculate GDP summary if data is available
-  const gdpSummary: GdpDataSummary | null = data ? calculateGdpSummary(data) : null;
-
-  // Calculate average GDP per capita
-  const averageGdp = data && data.length > 0
-    ? data.reduce((sum, item) => sum + item.value, 0) / data.length
+  // GDP per Capita
+  const { data: gdpData, isLoading, error } = useQuery('gdpPerCapita', fetchGdpPerCapita);
+  const gdpSummary: GdpDataSummary | null = gdpData ? calculateGdpSummary(gdpData) : null;
+  const averageGdp = gdpData && gdpData.length > 0
+    ? gdpData.reduce((sum, item) => sum + item.value, 0) / gdpData.length
     : null;
-  
-  // Function to format currency with commas and 2 decimal places
   const formatCurrency = (value: number): string => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -28,9 +23,33 @@ const OverviewTab: React.FC = () => {
     }).format(value);
   };
 
+  // Credit Card Usage (per 1,000 adults)
+  const { data: creditCardData } = useQuery(['creditCardUsage', '10P3AD'], () => fetchCreditCardUsage('10P3AD'));
+  const avgCreditCard = creditCardData && creditCardData.length > 0
+    ? creditCardData.reduce((sum, item) => sum + item.value, 0) / creditCardData.length
+    : null;
+
+  // Inflation (average yearly increase)
+  const { data: inflationData } = useQuery('inflation', fetchInflation);
+  const avgInflation = inflationData && inflationData.length > 1
+    ? (inflationData[inflationData.length - 1].value - inflationData[0].value) / (inflationData.length - 1)
+    : null;
+
+  // CPI (average yearly increment)
+  const { data: cpiData } = useQuery('cpi', fetchCpi);
+  const avgCpi = cpiData && cpiData.length > 1
+    ? (cpiData[cpiData.length - 1].value - cpiData[0].value) / (cpiData.length - 1)
+    : null;
+
+  // Mobile & Internet Banking (per 1,000 adults)
+  const { data: mibData } = useQuery(['mobileInternetBanking', '10P3AD'], () => fetchMobileInternetBanking('10P3AD'));
+  const avgMib = mibData && mibData.length > 0
+    ? mibData.reduce((sum, item) => sum + item.value, 0) / mibData.length
+    : null;
+
   if (isLoading) return <LoadingSpinner />;
   if (error) return <ErrorMessage message="Failed to load GDP data" />;
-  
+
   return (
     <div className="slide-in">
       <div className="mb-8">
@@ -45,7 +64,8 @@ const OverviewTab: React.FC = () => {
       </div>
 
       {averageGdp !== null && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-8">
+          {/* GDP Card */}
           <div className="card p-6">
             <div className="flex items-start">
               <div className="rounded-full bg-blue-100 p-3 mr-4">
@@ -57,6 +77,66 @@ const OverviewTab: React.FC = () => {
                   {formatCurrency(averageGdp)}
                 </p>
                 <p className="text-xs text-slate-500">{gdpSummary?.startYear} - {gdpSummary?.endYear}</p>
+              </div>
+            </div>
+          </div>
+          {/* Credit Card Usage Card */}
+          <div className="card p-6">
+            <div className="flex items-start">
+              <div className="rounded-full bg-green-100 p-3 mr-4">
+                <TrendingUp className="h-6 w-6 text-green-600" />
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-slate-500">Avg Credit Card Usage / 1,000 Adults</h3>
+                <p className="text-2xl font-semibold number-mono text-slate-800">
+                  {avgCreditCard !== null ? avgCreditCard.toLocaleString('en-US', { maximumFractionDigits: 2 }) : '--'}
+                </p>
+                <p className="text-xs text-slate-500">{creditCardData?.[0]?.year} - {creditCardData?.[creditCardData.length-1]?.year}</p>
+              </div>
+            </div>
+          </div>
+          {/* Inflation Card */}
+          <div className="card p-6">
+            <div className="flex items-start">
+              <div className="rounded-full bg-purple-100 p-3 mr-4">
+                <BarChart className="h-6 w-6 text-purple-600" />
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-slate-500">Avg Yearly Inflation Increase</h3>
+                <p className="text-2xl font-semibold number-mono text-slate-800">
+                  {avgInflation !== null ? avgInflation.toFixed(2) + '%' : '--'}
+                </p>
+                <p className="text-xs text-slate-500">{inflationData?.[0]?.year} - {inflationData?.[inflationData.length-1]?.year}</p>
+              </div>
+            </div>
+          </div>
+          {/* CPI Card */}
+          <div className="card p-6">
+            <div className="flex items-start">
+              <div className="rounded-full bg-orange-100 p-3 mr-4">
+                <BarChart className="h-6 w-6 text-orange-500" />
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-slate-500">Avg Yearly CPI Increment</h3>
+                <p className="text-2xl font-semibold number-mono text-slate-800">
+                  {avgCpi !== null ? avgCpi.toFixed(2) : '--'}
+                </p>
+                <p className="text-xs text-slate-500">{cpiData?.[0]?.year} - {cpiData?.[cpiData.length-1]?.year}</p>
+              </div>
+            </div>
+          </div>
+          {/* Mobile & Internet Banking Card */}
+          <div className="card p-6">
+            <div className="flex items-start">
+              <div className="rounded-full bg-red-100 p-3 mr-4">
+                <BarChart className="h-6 w-6 text-red-500" />
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-slate-500">Avg Mobile & Internet Banking / 1,000 Adults</h3>
+                <p className="text-2xl font-semibold number-mono text-slate-800">
+                  {avgMib !== null ? avgMib.toLocaleString('en-US', { maximumFractionDigits: 2 }) : '--'}
+                </p>
+                <p className="text-xs text-slate-500">{mibData?.[0]?.year} - {mibData?.[mibData.length-1]?.year}</p>
               </div>
             </div>
           </div>

@@ -74,6 +74,7 @@ const LineChart: React.FC<LineChartProps> = ({
           font: {
             family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica',
             size: 12,
+            weight: 'bold',
           },
           padding: 20,
         },
