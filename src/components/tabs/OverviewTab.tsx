@@ -6,6 +6,7 @@ import { GdpDataSummary } from '../../types/gdpTypes';
 import { calculateGdpSummary } from '../../utils/dataUtils';
 import LoadingSpinner from '../ui/LoadingSpinner';
 import ErrorMessage from '../ui/ErrorMessage';
+import StackedComparisonChart from '../visualizations/StackedComparisonChart';
 
 const OverviewTab: React.FC = () => {
   // GDP per Capita
@@ -23,12 +24,6 @@ const OverviewTab: React.FC = () => {
     }).format(value);
   };
 
-  // Credit Card Usage (per 1,000 adults)
-  const { data: creditCardData } = useQuery(['creditCardUsage', '10P3AD'], () => fetchCreditCardUsage('10P3AD'));
-  const avgCreditCard = creditCardData && creditCardData.length > 0
-    ? creditCardData.reduce((sum, item) => sum + item.value, 0) / creditCardData.length
-    : null;
-
   // Inflation (average yearly increase)
   const { data: inflationData } = useQuery('inflation', fetchInflation);
   const avgInflation = inflationData && inflationData.length > 1
@@ -41,11 +36,78 @@ const OverviewTab: React.FC = () => {
     ? (cpiData[cpiData.length - 1].value - cpiData[0].value) / (cpiData.length - 1)
     : null;
 
+  // Credit Card Usage (per 1,000 adults)
+  const { data: creditCardData } = useQuery(['creditCardUsage', '10P3AD'], () => fetchCreditCardUsage('10P3AD'));
+  const avgCreditCard = creditCardData && creditCardData.length > 0
+    ? creditCardData.reduce((sum, item) => sum + item.value, 0) / creditCardData.length
+    : null;
+    
   // Mobile & Internet Banking (per 1,000 adults)
   const { data: mibData } = useQuery(['mobileInternetBanking', '10P3AD'], () => fetchMobileInternetBanking('10P3AD'));
   const avgMib = mibData && mibData.length > 0
     ? mibData.reduce((sum, item) => sum + item.value, 0) / mibData.length
     : null;
+
+  const [visibleMetrics, setVisibleMetrics] = React.useState([
+    'GDP Per Capita',
+    'Inflation',
+    'CPI',
+    'Credit Card Usage',
+    'Mobile & Internet Banking',
+  ]);
+
+  const allYears = React.useMemo(() => {
+    // Collect all years from all datasets, then dedupe and sort
+    const years = [
+      ...(gdpData?.map(d => d.year) || []),
+      ...(inflationData?.map(d => d.year) || []),
+      ...(cpiData?.map(d => d.year) || []),
+      ...(creditCardData?.map(d => d.year) || []),
+      ...(mibData?.map(d => d.year) || []),
+    ];
+    return Array.from(new Set(years)).sort();
+  }, [gdpData, inflationData, cpiData, creditCardData, mibData]);
+
+  const stackedDatasets = [
+    {
+      label: 'GDP Per Capita',
+      color: 'rgb(59, 130, 246)', // blue
+      data: gdpData?.map(d => ({ x: d.year, y: d.value })) || [],
+      visible: visibleMetrics.includes('GDP Per Capita'),
+    },
+    {
+      label: 'Inflation',
+      color: 'rgb(139, 92, 246)', // purple
+      data: inflationData?.map(d => ({ x: d.year, y: d.value })) || [],
+      visible: visibleMetrics.includes('Inflation'),
+    },
+    {
+      label: 'CPI',
+      color: 'rgb(251, 146, 60)', // orange
+      data: cpiData?.map(d => ({ x: d.year, y: d.value })) || [],
+      visible: visibleMetrics.includes('CPI'),
+    },
+    {
+      label: 'Credit Card Usage',
+      color: 'rgb(34, 197, 94)', // green
+      data: creditCardData?.map(d => ({ x: d.year, y: d.value })) || [],
+      visible: visibleMetrics.includes('Credit Card Usage'),
+    },
+    {
+      label: 'Mobile & Internet Banking',
+      color: 'rgb(239, 68, 68)', // red
+      data: mibData?.map(d => ({ x: d.year, y: d.value })) || [],
+      visible: visibleMetrics.includes('Mobile & Internet Banking'),
+    },
+  ];
+
+  const handleToggleMetric = (label: string) => {
+    setVisibleMetrics(prev =>
+      prev.includes(label)
+        ? prev.filter(l => l !== label)
+        : [...prev, label]
+    );
+  };
 
   if (isLoading) return <LoadingSpinner />;
   if (error) return <ErrorMessage message="Failed to load data" />;
@@ -75,21 +137,6 @@ const OverviewTab: React.FC = () => {
                   {formatCurrency(averageGdp)}
                 </p>
                 <p className="text-xs text-slate-500">{gdpSummary?.startYear} - {gdpSummary?.endYear}</p>
-              </div>
-            </div>
-          </div>
-          {/* Credit Card Usage Card */}
-          <div className="card p-6">
-            <div className="flex items-start">
-              <div className="rounded-full bg-green-100 p-3 mr-4">
-                <CreditCard className="h-6 w-6 text-green-600" />
-              </div>
-              <div>
-                <h3 className="text-sm font-medium text-slate-500">Avg Credit Card Usage / 1,000 Adults</h3>
-                <p className="text-2xl font-semibold number-mono text-slate-800">
-                  {avgCreditCard !== null ? avgCreditCard.toLocaleString('en-US', { maximumFractionDigits: 2 }) : '--'}
-                </p>
-                <p className="text-xs text-slate-500">{creditCardData?.[0]?.year} - {creditCardData?.[creditCardData.length-1]?.year}</p>
               </div>
             </div>
           </div>
@@ -123,6 +170,21 @@ const OverviewTab: React.FC = () => {
               </div>
             </div>
           </div>
+          {/* Credit Card Usage Card */}
+          <div className="card p-6">
+            <div className="flex items-start">
+              <div className="rounded-full bg-green-100 p-3 mr-4">
+                <CreditCard className="h-6 w-6 text-green-600" />
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-slate-500">Avg Credit Card Usage / 1,000 Adults</h3>
+                <p className="text-2xl font-semibold number-mono text-slate-800">
+                  {avgCreditCard !== null ? avgCreditCard.toLocaleString('en-US', { maximumFractionDigits: 2 }) : '--'}
+                </p>
+                <p className="text-xs text-slate-500">{creditCardData?.[0]?.year} - {creditCardData?.[creditCardData.length-1]?.year}</p>
+              </div>
+            </div>
+          </div>
           {/* Mobile & Internet Banking Card */}
           <div className="card p-6">
             <div className="flex items-start">
@@ -140,6 +202,17 @@ const OverviewTab: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Stacked Comparison Chart Section */}
+      <div className="card p-6 mb-8">
+        <h3 className="text-lg font-medium text-slate-800 mb-4">Compare Key Economic Metrics</h3>
+        <p className="text-slate-600 mb-4 text-sm">Toggle metrics below to compare trends across GDP, inflation, CPI, credit card usage, and mobile/internet banking. Lines are smoothed for clarity.</p>
+        <StackedComparisonChart
+          datasets={stackedDatasets}
+          years={allYears}
+          onToggle={handleToggleMetric}
+        />
+      </div>
 
       <div className="card p-6">
         <h3 className="text-lg font-medium text-slate-800 mb-4">Available Datasets</h3>

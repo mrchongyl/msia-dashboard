@@ -31,15 +31,6 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, setActiveTab }
         </button>
         <button
           className={`tab flex items-center ${
-            activeTab === 'creditCardUsage' ? 'tab-active' : 'tab-inactive'
-          }`}
-          onClick={() => setActiveTab('creditCardUsage' as TabType)}
-        >
-          <CreditCard className="w-4 h-4 mr-2" />
-          Credit Card Usage
-        </button>
-        <button
-          className={`tab flex items-center ${
             activeTab === 'inflation' ? 'tab-active' : 'tab-inactive'
           }`}
           onClick={() => setActiveTab('inflation' as TabType)}
@@ -55,6 +46,15 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, setActiveTab }
         >
           <CircleDollarSign className="w-4 h-4 mr-2 text-orange-500" />
           CPI
+        </button>
+        <button
+          className={`tab flex items-center ${
+            activeTab === 'creditCardUsage' ? 'tab-active' : 'tab-inactive'
+          }`}
+          onClick={() => setActiveTab('creditCardUsage' as TabType)}
+        >
+          <CreditCard className="w-4 h-4 mr-2" />
+          Credit Card Usage
         </button>
         <button
           className={`tab flex items-center ${
