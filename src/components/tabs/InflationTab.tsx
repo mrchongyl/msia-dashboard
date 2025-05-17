@@ -109,7 +109,7 @@ const InflationTab: React.FC = () => {
         <div>
           <h2 className="text-2xl font-bold text-slate-800 flex items-center">
             <Percent className="mr-2 h-6 w-6 text-purple-600" />
-            Inflation Rate (Annual %)
+            Inflation, consumer prices (annual % growth)
           </h2>
           <p className="text-slate-600 mt-1">
             Annual inflation rate (CPI, %) for Malaysia. <br />

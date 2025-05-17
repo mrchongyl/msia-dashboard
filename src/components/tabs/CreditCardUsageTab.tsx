@@ -11,8 +11,8 @@ import * as ss from 'simple-statistics';
 import regression from 'regression';
 
 const unitOptions = [
+  { value: '10P3AD', label: 'Per 1,000 Adults' },
   { value: 'ACCT', label: 'Number of Accounts' },
-  { value: '10P3AD', label: 'Per 10,000 Adults' },
 ];
 
 function calculateCreditCardSummary(data: CreditCardUsageItem[]) {
@@ -35,13 +35,13 @@ function calculateCreditCardSummary(data: CreditCardUsageItem[]) {
 
 const CreditCardUsageTab: React.FC = () => {
   const [timeRange, setTimeRange] = useState<TimeRange>('all');
-  const [unitMeasure, setUnitMeasure] = useState<string>('ACCT');
+  const [unitMeasure, setUnitMeasure] = useState<string>('10P3AD');
   const { data, isLoading, error } = useQuery(['creditCardUsage', unitMeasure], () => fetchCreditCardUsage(unitMeasure));
 
   // Filter data based on selected time range and selected unit
   const getFilteredData = (): CreditCardUsageItem[] => {
     if (!data) return [];
-    // Only include items matching the selected unitMeasure (in case API returns multiple units)
+    // Only include items matching the selected unitMeasure
     const filteredByUnit = data.filter(item => !('unit' in item) || (item as any).unit === unitMeasure);
     switch (timeRange) {
       case 'last10':
@@ -118,7 +118,7 @@ const CreditCardUsageTab: React.FC = () => {
         <div>
           <h2 className="text-2xl font-bold text-slate-800 flex items-center">
             <CreditCard className="mr-2 h-6 w-6 text-green-600" />
-            Credit Card Usage (Count)
+            Use of Financial Services, Credit cards 
           </h2>
             <p className="text-slate-600 mt-1">
             Annual number of credit card usage in Malaysia.<br />

@@ -36,16 +36,18 @@ const OverviewTab: React.FC = () => {
     ? (cpiData[cpiData.length - 1].value - cpiData[0].value) / (cpiData.length - 1)
     : null;
 
-  // Credit Card Usage (per 1,000 adults)
+  // Credit Card Usage (per 1,000 adults, 10P3AD only)
   const { data: creditCardData } = useQuery(['creditCardUsage', '10P3AD'], () => fetchCreditCardUsage('10P3AD'));
-  const avgCreditCard = creditCardData && creditCardData.length > 0
-    ? creditCardData.reduce((sum, item) => sum + item.value, 0) / creditCardData.length
+  const creditCard10P3AD = creditCardData?.filter(d => d.unit === '10P3AD') || [];
+  const avgCreditCard = creditCard10P3AD.length > 0
+    ? creditCard10P3AD.reduce((sum, item) => sum + item.value, 0) / creditCard10P3AD.length
     : null;
-    
-  // Mobile & Internet Banking (per 1,000 adults)
+
+  // Mobile & Internet Banking (per 1,000 adults, 10P3AD only)
   const { data: mibData } = useQuery(['mobileInternetBanking', '10P3AD'], () => fetchMobileInternetBanking('10P3AD'));
-  const avgMib = mibData && mibData.length > 0
-    ? mibData.reduce((sum, item) => sum + item.value, 0) / mibData.length
+  const mib10P3AD = mibData?.filter(d => d.unit === '10P3AD') || [];
+  const avgMib = mib10P3AD.length > 0
+    ? mib10P3AD.reduce((sum, item) => sum + item.value, 0) / mib10P3AD.length
     : null;
 
   const [visibleMetrics, setVisibleMetrics] = React.useState([
@@ -123,6 +125,7 @@ const OverviewTab: React.FC = () => {
         </p>
       </div>
 
+
       {averageGdp !== null && (
         <div className="grid w-full grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-8">
           {/* GDP Card */}
@@ -147,7 +150,7 @@ const OverviewTab: React.FC = () => {
                 <Percent className="h-6 w-6 text-purple-600" />
               </div>
               <div>
-                <h3 className="text-sm font-medium text-slate-500">Avg Yearly Inflation Increase</h3>
+                <h3 className="text-sm font-medium text-slate-500">Average Yearly Inflation Increase</h3>
                 <p className="text-2xl font-semibold number-mono text-slate-800">
                   {avgInflation !== null ? avgInflation.toFixed(2) + '%' : '--'}
                 </p>
@@ -162,7 +165,7 @@ const OverviewTab: React.FC = () => {
                 <BarChart className="h-6 w-6 text-orange-500" />
               </div>
               <div>
-                <h3 className="text-sm font-medium text-slate-500">Avg Yearly CPI Increment</h3>
+                <h3 className="text-sm font-medium text-slate-500">Average Yearly CPI Increment</h3>
                 <p className="text-2xl font-semibold number-mono text-slate-800">
                   {avgCpi !== null ? avgCpi.toFixed(2) : '--'}
                 </p>
@@ -177,11 +180,11 @@ const OverviewTab: React.FC = () => {
                 <CreditCard className="h-6 w-6 text-green-600" />
               </div>
               <div>
-                <h3 className="text-sm font-medium text-slate-500">Avg Credit Card Usage / 1,000 Adults</h3>
+                <h3 className="text-sm font-medium text-slate-500">Average Credit Card Usage / 1,000 Adults</h3>
                 <p className="text-2xl font-semibold number-mono text-slate-800">
                   {avgCreditCard !== null ? avgCreditCard.toLocaleString('en-US', { maximumFractionDigits: 2 }) : '--'}
                 </p>
-                <p className="text-xs text-slate-500">{creditCardData?.[0]?.year} - {creditCardData?.[creditCardData.length-1]?.year}</p>
+                <p className="text-xs text-slate-500">{creditCard10P3AD[0]?.year} - {creditCard10P3AD[creditCard10P3AD.length-1]?.year}</p>
               </div>
             </div>
           </div>
@@ -192,11 +195,11 @@ const OverviewTab: React.FC = () => {
                 <Wifi className="h-6 w-6 text-red-500" />
               </div>
               <div>
-                <h3 className="text-sm font-medium text-slate-500">Avg Mobile & Internet Banking / 1,000 Adults</h3>
+                <h3 className="text-sm font-medium text-slate-500">Average Mobile & Internet Banking / 1,000 Adults</h3>
                 <p className="text-2xl font-semibold number-mono text-slate-800">
                   {avgMib !== null ? avgMib.toLocaleString('en-US', { maximumFractionDigits: 2 }) : '--'}
                 </p>
-                <p className="text-xs text-slate-500">{mibData?.[0]?.year} - {mibData?.[mibData.length-1]?.year}</p>
+                <p className="text-xs text-slate-500">{mib10P3AD[0]?.year} - {mib10P3AD[mib10P3AD.length-1]?.year}</p>
               </div>
             </div>
           </div>
@@ -212,6 +215,38 @@ const OverviewTab: React.FC = () => {
           years={allYears}
           onToggle={handleToggleMetric}
         />
+      </div>
+
+      {/* Statistical Insights Card */}
+      <div className="card p-6 mb-8">
+        <h3 className="text-lg font-medium text-slate-800 mb-2">Statistical Insights</h3>
+        <ul className="list-disc pl-6 text-slate-700 text-base space-y-2">
+          {gdpData && gdpData.length > 1 && (
+            <li>
+              GDP per capita grew from <b>{formatCurrency(gdpData[0].value)}</b> in {gdpData[0].year} to <b>{formatCurrency(gdpData[gdpData.length-1].value)}</b> in {gdpData[gdpData.length-1].year}, a total increase of <b>{(((gdpData[gdpData.length-1].value - gdpData[0].value) / gdpData[0].value) * 100).toFixed(1)}%</b>.
+            </li>
+          )}
+          {inflationData && inflationData.length > 1 && (
+            <li>
+              The average annual inflation rate was <b>{avgInflation !== null ? avgInflation.toFixed(2) + '%': '--'}</b> from {inflationData[0].year} to {inflationData[inflationData.length-1].year}. Highest inflation: <b>{Math.max(...inflationData.map(d => d.value)).toFixed(2)}%</b>.
+            </li>
+          )}
+          {cpiData && cpiData.length > 1 && (
+            <li>
+              The Consumer Price Index (CPI) increased from <b>{cpiData[0].value.toFixed(2)}</b> in {cpiData[0].year} to <b>{cpiData[cpiData.length-1].value.toFixed(2)}</b> in {cpiData[cpiData.length-1].year}, a total increase of <b>{(((cpiData[cpiData.length-1].value - cpiData[0].value) / cpiData[0].value) * 100).toFixed(1)}%</b>.
+            </li>
+          )}
+          {creditCardData && creditCardData.length > 1 && (
+            <li>
+              Credit card usage <b>per 1,000 adults</b> ranged from <b>{Math.min(...creditCardData.map(d => d.value)).toFixed(2)}</b> to <b>{Math.max(...creditCardData.map(d => d.value)).toFixed(2)}</b> over the available years.
+            </li>
+          )}
+          {mibData && mibData.length > 1 && (
+            <li>
+              Mobile & Internet banking usage <b>per 1,000 adults</b> ranged from <b>{Math.min(...mibData.map(d => d.value)).toFixed(2)}</b> to <b>{Math.max(...mibData.map(d => d.value)).toFixed(2)}</b> over the available years.
+            </li>
+          )}
+        </ul>
       </div>
 
       <div className="card p-6">
@@ -239,7 +274,7 @@ const OverviewTab: React.FC = () => {
           </li>
           {/* Annual Inflation Rate Dataset */}
           <li className="flex items-start">
-            <div className="rounded-full bg-blue-100 p-2 mr-3">
+            <div className="rounded-full bg-purple-100 p-2 mr-3">
               <Percent className="h-4 w-4 text-purple-600" />
             </div>
             <div>
@@ -259,7 +294,7 @@ const OverviewTab: React.FC = () => {
           </li>
           {/* Consumer Price Index (CPI) Dataset */}
           <li className="flex items-start">
-            <div className="rounded-full bg-blue-100 p-2 mr-3">
+            <div className="rounded-full bg-orange-100 p-2 mr-3">
               <CircleDollarSign className="h-4 w-4 text-orange-600" />
             </div>
             <div>
@@ -280,13 +315,13 @@ const OverviewTab: React.FC = () => {
           </li>
           {/* Credit Card Usage Dataset */}
           <li className="flex items-start">
-            <div className="rounded-full bg-blue-100 p-2 mr-3">
+            <div className="rounded-full bg-green-100 p-2 mr-3">
               <CreditCard className="h-4 w-4 text-green-600" />
             </div>
             <div>
               <h4 className="font-medium text-slate-800">Use of Financial Services, Credit cards</h4>
               <p className="text-sm text-slate-600 mb-2">
-                Annual number of credit card usage from {gdpSummary?.startYear} to {gdpSummary?.endYear}.
+                Annual number of credit card usage from {creditCardData?.[0]?.year} to {creditCardData?.[creditCardData.length-1]?.year}.
               </p>
               <a 
                 href="https://data360.worldbank.org/en/indicator/IMF_FAS_FCCCC" 
@@ -300,13 +335,13 @@ const OverviewTab: React.FC = () => {
           </li>
           {/* Mobile & Internet Banking Dataset */}
           <li className="flex items-start">
-            <div className="rounded-full bg-blue-100 p-2 mr-3">
+            <div className="rounded-full bg-red-100 p-2 mr-3">
               <Wifi className="h-4 w-4 text-red-600" />
             </div>
             <div>
               <h4 className="font-medium text-slate-800">Use of Financial Services, Mobile and internet banking transactions (during the reference year, for commercial banks only)</h4>
               <p className="text-sm text-slate-600 mb-2">
-                Annual gross domestic product per person in current US dollars from {gdpSummary?.startYear} to {gdpSummary?.endYear}.
+                Annual number of mobile and internet banking transactions from {mib10P3AD[0]?.year} to {mib10P3AD[mib10P3AD.length-1]?.year}.
               </p>
               <a 
                 href="https://data360.worldbank.org/en/indicator/IMF_FAS_FCMIBT?view=trend" 

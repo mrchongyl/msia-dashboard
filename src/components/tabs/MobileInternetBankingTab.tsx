@@ -12,15 +12,15 @@ import * as ss from 'simple-statistics';
 import regression from 'regression';
 
 const unitOptions = [
+  { value: '10P3AD', label: 'Per 1,000 Adults' },
   { value: 'XDC', label: 'Domestic Currency (XDC)' },
   { value: 'TRANSACT', label: 'Transactions' },
-  { value: '10P3AD', label: 'Per 1,000 Adults' },
   { value: 'PT_GDP', label: 'Percentage of GDP' },
 ];
 
 const MobileInternetBankingTab: React.FC = () => {
   const [timeRange, setTimeRange] = useState<TimeRange>('all');
-  const [unitMeasure, setUnitMeasure] = useState<string>('XDC');
+  const [unitMeasure, setUnitMeasure] = useState<string>('10P3AD');
   const { data, isLoading, error } = useQuery(['mobileInternetBanking', unitMeasure], () => fetchMobileInternetBanking(unitMeasure));
 
   // Filter data based on selected time range and selected unit
@@ -101,7 +101,7 @@ const MobileInternetBankingTab: React.FC = () => {
         <div>
           <h2 className="text-2xl font-bold text-slate-800 flex items-center">
             <Wifi className="mr-2 h-6 w-6 text-red-500" />
-            Mobile & Internet Banking
+            Use of Financial Services, Mobile and internet banking transactions
           </h2>
           <p className="text-slate-600 mt-1">
             Annual Mobile & Internet Banking data for Malaysia.<br />
