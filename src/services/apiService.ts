@@ -2,7 +2,7 @@ import axios from 'axios';
 import { GdpDataItem } from '../types/gdpTypes';
 
 // API base URL - points to our Flask backend
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'http://flask-env.eba-kjeknfqs.us-east-1.elasticbeanstalk.com/api';
 
 /**
  * Fetches GDP per capita data from the API
