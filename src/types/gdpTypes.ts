@@ -1,6 +1,6 @@
 // Types for GDP data
 
-export type TimeRange = 'all' | 'last10' | 'last20' | 'last30' | 'since2000';
+export type TimeRange = 'all' | 'last5' | 'last10' | 'last20' | 'last30' | 'since2000';
 
 export interface GdpDataItem {
   year: string;

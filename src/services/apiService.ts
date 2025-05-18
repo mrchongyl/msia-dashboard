@@ -55,10 +55,11 @@ export interface CreditCardUsageItem {
   unit?: string;
 }
 
-export const fetchCreditCardUsage = async (unitMeasure?: string): Promise<CreditCardUsageItem[]> => {
+export const fetchCreditCardUsage = async (unitMeasure?: string, countryCode: string = 'MYS'): Promise<CreditCardUsageItem[]> => {
   try {
     const params: any = {};
     if (unitMeasure) params.unit_measure = unitMeasure;
+    if (countryCode) params.country = countryCode;
     const response = await axios.get(`${API_BASE_URL}/credit-card-usage`, { params });
     const rawData = Array.isArray(response.data.data?.value)
       ? response.data.data.value
@@ -84,9 +85,9 @@ export interface InflationDataItem {
   value: number;
 }
 
-export const fetchInflation = async (): Promise<InflationDataItem[]> => {
+export const fetchInflation = async (countryCode: string = 'MYS'): Promise<InflationDataItem[]> => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/inflation`);
+    const response = await axios.get(`${API_BASE_URL}/inflation`, { params: { country: countryCode } });
     const rawData = Array.isArray(response.data.data?.value)
       ? response.data.data.value
       : Array.isArray(response.data.data)
@@ -110,9 +111,9 @@ export interface CpiDataItem {
   value: number;
 }
 
-export const fetchCpi = async (): Promise<CpiDataItem[]> => {
+export const fetchCpi = async (countryCode: string = 'MYS'): Promise<CpiDataItem[]> => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/cpi`);
+    const response = await axios.get(`${API_BASE_URL}/cpi`, { params: { country: countryCode } });
     const rawData = Array.isArray(response.data.data?.value)
       ? response.data.data.value
       : Array.isArray(response.data.data)
@@ -137,10 +138,11 @@ export interface MobileInternetBankingItem {
   unit?: string;
 }
 
-export const fetchMobileInternetBanking = async (unitMeasure?: string): Promise<MobileInternetBankingItem[]> => {
+export const fetchMobileInternetBanking = async (unitMeasure?: string, countryCode: string = 'MYS'): Promise<MobileInternetBankingItem[]> => {
   try {
     const params: any = {};
     if (unitMeasure) params.unit_measure = unitMeasure;
+    if (countryCode) params.country = countryCode;
     const response = await axios.get(`${API_BASE_URL}/mobile-internet-banking`, { params });
     const rawData = Array.isArray(response.data.data?.value)
       ? response.data.data.value

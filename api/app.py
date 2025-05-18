@@ -7,18 +7,16 @@ app = Flask(__name__)
 # Enable CORS for all routes
 CORS(app)
 
+ASEAN_COUNTRIES = ["BRN", "KHM", "IDN", "LAO", "MYS", "MMR", "PHL", "SGP", "THA", "VNM"]
+
 @app.route('/api/gdp-per-capita', methods=['GET'])
 def get_gdp_per_capita():
     """Proxy endpoint to fetch GDP per capita data from World Bank Data360 API for ASEAN countries"""
     try:
-        # ASEAN country codes
-        asean_countries = ["BRN", "KHM", "IDN", "LAO", "MYS", "MMR", "PHL", "SGP", "THA", "VNM"]
         # Parse query parameters
         start_year = request.args.get('from', '1960')
         end_year = request.args.get('to', '2023')
         country = request.args.get('country', 'MYS').upper()
-        if country not in asean_countries:
-            return jsonify({"error": f"Invalid country code. Must be one of: {', '.join(asean_countries)}"}), 400
         # World Bank API endpoint
         url = f"https://data360api.worldbank.org/data360/data"
         # Query parameters
@@ -34,7 +32,6 @@ def get_gdp_per_capita():
         response = requests.get(url, params=params)
         response.raise_for_status()  # Raise exception for HTTP errors
         wb_data = response.json()
-        print('World Bank API response:', wb_data)  # Debug print
         # Always wrap the response in a 'data' property
         if isinstance(wb_data, dict) and 'data' in wb_data:
             return jsonify({'data': wb_data['data']})
@@ -47,15 +44,16 @@ def get_gdp_per_capita():
 
 @app.route('/api/credit-card-usage', methods=['GET'])
 def get_credit_card_usage():
-    """Proxy endpoint to fetch credit card usage data from World Bank Data360 API"""
+    """Proxy endpoint to fetch credit card usage data from World Bank Data360 API for ASEAN countries"""
     try:
         start_year = request.args.get('from', '1960')
         end_year = request.args.get('to', '2023')
+        country = request.args.get('country', 'MYS').upper()
         url = f"https://data360api.worldbank.org/data360/data"
         params = {
             'DATABASE_ID': 'IMF_FAS',
             'INDICATOR': 'IMF_FAS_FCCCC',
-            'REF_AREA': 'MYS',
+            'REF_AREA': country,
             'timePeriodFrom': start_year,
             'timePeriodTo': end_year,
             'skip': 0
@@ -76,15 +74,16 @@ def get_credit_card_usage():
 
 @app.route('/api/inflation', methods=['GET'])
 def get_inflation():
-    """Proxy endpoint to fetch inflation (CPI, annual %) data from World Bank Data360 API"""
+    """Proxy endpoint to fetch inflation (CPI, annual %) data from World Bank Data360 API for ASEAN countries"""
     try:
         start_year = request.args.get('from', '1960')
         end_year = request.args.get('to', '2023')
+        country = request.args.get('country', 'MYS').upper()
         url = f"https://data360api.worldbank.org/data360/data"
         params = {
             'DATABASE_ID': 'WB_WDI',
             'INDICATOR': 'WB_WDI_FP_CPI_TOTL_ZG',
-            'REF_AREA': 'MYS',
+            'REF_AREA': country,
             'timePeriodFrom': start_year,
             'timePeriodTo': end_year,
             'skip': 0
@@ -103,15 +102,16 @@ def get_inflation():
 
 @app.route('/api/cpi', methods=['GET'])
 def get_cpi():
-    """Proxy endpoint to fetch Consumer Price Index (CPI) data from World Bank Data360 API"""
+    """Proxy endpoint to fetch Consumer Price Index (CPI) data from World Bank Data360 API for ASEAN countries"""
     try:
         start_year = request.args.get('from', '1960')
         end_year = request.args.get('to', '2023')
+        country = request.args.get('country', 'MYS').upper()
         url = f"https://data360api.worldbank.org/data360/data"
         params = {
             'DATABASE_ID': 'WB_WDI',
             'INDICATOR': 'WB_WDI_FP_CPI_TOTL',
-            'REF_AREA': 'MYS',
+            'REF_AREA': country,
             'timePeriodFrom': start_year,
             'timePeriodTo': end_year,
             'skip': 0
@@ -130,16 +130,17 @@ def get_cpi():
 
 @app.route('/api/mobile-internet-banking', methods=['GET'])
 def get_mobile_internet_banking():
-    """Proxy endpoint to fetch Mobile & Internet Banking data from World Bank Data360 API"""
+    """Proxy endpoint to fetch Mobile & Internet Banking data from World Bank Data360 API for ASEAN countries"""
     try:
         start_year = request.args.get('from', '1960')
         end_year = request.args.get('to', '2024')
+        country = request.args.get('country', 'MYS').upper()
         unit_measure = request.args.get('unit_measure')
         url = f"https://data360api.worldbank.org/data360/data"
         params = {
             'DATABASE_ID': 'IMF_FAS',
             'INDICATOR': 'IMF_FAS_FCMIBT',
-            'REF_AREA': 'MYS',
+            'REF_AREA': country,
             'timePeriodFrom': start_year,
             'timePeriodTo': end_year,
             'skip': 0

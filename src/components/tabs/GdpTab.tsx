@@ -224,7 +224,7 @@ const GdpTab: React.FC = () => {
       {/* Malaysian GDP Summary Section */}
       {gdpSummary && (
         <>
-          <h3 className="text-xl font-semibold text-slate-800 mb-4">Malaysian GDP Summary</h3>
+          <h3 className="text-xl font-semibold text-slate-800 mb-4">Malaysia GDP Summary</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div className="card p-6">
               <div className="flex items-start">
@@ -283,7 +283,7 @@ const GdpTab: React.FC = () => {
         </ul>
       </div>
 
-      {/* Table Section (all selected countries) */}
+      {/* Table Section */}
       <div className="card">
         <Table
           columns={[
