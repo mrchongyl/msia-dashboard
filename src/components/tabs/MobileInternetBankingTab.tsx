@@ -3,10 +3,10 @@ import { useQuery } from 'react-query';
 import { Download, BarChart, Wifi, Smartphone } from 'lucide-react';
 import { fetchMobileInternetBanking, ASEAN_COUNTRIES } from '../../services/apiService';
 import LineChart from '../visualizations/LineChart';
-import Table, { TableColumn } from '../visualizations/Table';
+import Table from '../visualizations/Table';
 import LoadingSpinner from '../ui/LoadingSpinner';
 import ErrorMessage from '../ui/ErrorMessage';
-import { MobileInternetBankingItem, TimeRange } from '../../types/gdpTypes';
+import { TimeRange } from '../../types/economicTypes';
 import { calculateGdpSummary } from '../../utils/dataUtils';
 import * as ss from 'simple-statistics';
 import regression from 'regression';
@@ -107,12 +107,6 @@ const MobileInternetBankingTab: React.FC = () => {
     link.click();
     document.body.removeChild(link);
   };
-
-  // Prepare columns for table
-  const columns: TableColumn<MobileInternetBankingItem>[] = [
-    { key: 'year', label: 'Year', align: 'left' },
-    { key: 'value', label: 'Mobile & Internet Banking', align: 'right', formatter: (v) => v.toLocaleString('en-US') },
-  ];
 
   return (
     <div className="slide-in">
@@ -278,11 +272,11 @@ const MobileInternetBankingTab: React.FC = () => {
       <div className="card">
         <Table
           columns={[
-            { key: 'year', label: 'Year', align: 'left' },
+            { key: 'year', label: 'Year', align: 'left' as const },
             ...selectedCountries.map((c) => ({
               key: c.value,
               label: c.label,
-              align: 'right' as 'right',
+              align: 'right' as const,
               formatter: (v: number) => v !== null && v !== undefined ? v.toLocaleString('en-US') : ''
             }))
           ]}

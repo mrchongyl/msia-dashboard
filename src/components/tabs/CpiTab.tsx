@@ -6,7 +6,7 @@ import LineChart from '../visualizations/LineChart';
 import Table from '../visualizations/Table';
 import LoadingSpinner from '../ui/LoadingSpinner';
 import ErrorMessage from '../ui/ErrorMessage';
-import { CpiDataItem, TimeRange } from '../../types/gdpTypes';
+import { CpiDataItem, TimeRange } from '../../types/economicTypes';
 import * as ss from 'simple-statistics';
 import regression from 'regression';
 import Select from 'react-select';
@@ -275,12 +275,12 @@ const CpiTab: React.FC = () => {
       <div className="card">
         <Table
           columns={[
-            { key: 'year', label: 'Year', align: "left" as const },
+            { key: 'year', label: 'Year', align: 'left' as const },
             ...selectedCountries.map((c) => ({
               key: c.value,
               label: c.label,
-              align: "right" as const,
-              formatter: (v: number) => v !== null && v !== undefined ? v.toFixed(2) : ''
+              align: 'right' as const,
+              formatter: (v: number) => v !== null && v !== undefined ? v.toLocaleString('en-US') : ''
             }))
           ]}
           data={(() => {

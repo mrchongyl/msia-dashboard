@@ -15,23 +15,23 @@ const DocumentationTab: React.FC = () => {
       </div>
       {/* Content sections */}
       <div className="border-l-4 border-yellow-400 p-6 mb-8 bg-white card">
-        <h3 className="text-lg font-semibold text-yellow-700 mb-2">Architecture Overview</h3>
-        <ul className="list-disc pl-6 text-black text-base mb-2">
+        <h3 className="text-lg font-semibold text-yellow-700 mb-4">Architecture Overview</h3>
+        <ul className="list-disc pl-6 text-slate-800 text-base space-y-2">
           <li><b>Frontend Framework:</b> React (TypeScript, Vite)</li>
           <li><b>State Management:</b> React Query for async data, React state for UI</li>
           <li><b>Styling:</b> Tailwind CSS for utility-first, responsive design</li>
-          <li><b>Data Visualization:</b> Chart.js (via react-chartjs-2), custom Table component</li>
+          <li><b>Data Visualization:</b> Chart.js (via react-chartjs-2), Data Table</li>
           <li><b>Routing:</b> Tab-based navigation (single-page, no URL routing)</li>
-          <li><b>API Integration:</b> Custom Flask backend (Python) fetching from World Bank APIs</li>
+          <li><b>API Integration:</b> Flask backend (Python) fetching from World Bank APIs</li>
           <li><b>Build System:</b> Vite for fast development and builds</li>
           <li><b>Component Architecture:</b> Modular, reusable components for charts, tables, cards, and UI</li>
         </ul>
       </div>
       <div className="border-l-4 border-yellow-400 p-6 mb-8 bg-white card">
-        <h3 className="text-lg font-semibold text-yellow-700 mb-2">API Endpoint Integrations</h3>
-        <ul className="list-disc pl-6 text-black text-base mb-2">
+        <h3 className="text-lg font-semibold text-yellow-700 mb-4">API Endpoint Integrations</h3>
+        <ul className="list-disc pl-6 text-slate-800 text-base space-y-2">
           <li><b>Flask Backend Endpoints:</b></li>
-          <ul className="list-disc pl-8">
+          <ul className="list-disc pl-8 space-y-1">
             <li><code>/api/gdp-per-capita</code> – GDP per capita data</li>
             <li><code>/api/inflation</code> – Inflation rate data</li>
             <li><code>/api/cpi</code> – Consumer Price Index data</li>
@@ -43,12 +43,12 @@ const DocumentationTab: React.FC = () => {
         </ul>
       </div>
       <div className="border-l-4 border-yellow-400 p-6 mb-8 bg-white card">
-        <h3 className="text-lg font-semibold text-yellow-700 mb-2">CI/CD Pipeline (GitHub)</h3>
-        <ul className="list-disc pl-6 text-black text-base mb-2">
+        <h3 className="text-lg font-semibold text-yellow-700 mb-4">CI/CD Pipeline (GitHub)</h3>
+        <ul className="list-disc pl-6 text-slate-800 text-base space-y-2">
           <li><b>Version Control:</b> GitHub</li>
           <li><b>CI/CD:</b> GitHub Actions for automated testing and deployment</li>
           <li><b>Typical Workflow:</b></li>
-          <ul className="list-disc pl-8">
+          <ul className="list-disc pl-8 space-y-1">
             <li>Pushes and pull requests trigger linting, type checks, and tests</li>
             <li>On main branch merge, build and deploy steps run automatically</li>
             <li>Frontend is deployed to AWS EC2</li>

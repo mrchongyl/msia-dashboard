@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { GdpDataItem } from '../types/gdpTypes';
+import { GdpDataItem } from '../types/economicTypes';
 
 // API base URL - points to our Flask backend
 const API_BASE_URL = 'http://localhost:5000/api';

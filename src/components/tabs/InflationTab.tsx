@@ -6,7 +6,7 @@ import LineChart from '../visualizations/LineChart';
 import Table from '../visualizations/Table';
 import LoadingSpinner from '../ui/LoadingSpinner';
 import ErrorMessage from '../ui/ErrorMessage';
-import { InflationDataItem, TimeRange } from '../../types/gdpTypes';
+import { InflationDataItem, TimeRange } from '../../types/economicTypes';
 import * as ss from 'simple-statistics';
 import regression from 'regression';
 import Select from 'react-select';

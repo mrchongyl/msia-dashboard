@@ -3,10 +3,10 @@ import { useQuery } from 'react-query';
 import { TrendingUp, Download, DollarSign, BarChart } from 'lucide-react';
 import { fetchGdpPerCapita, ASEAN_COUNTRIES } from '../../services/apiService';
 import LineChart from '../visualizations/LineChart';
-import Table, { TableColumn } from '../visualizations/Table';
+import Table from '../visualizations/Table';
 import LoadingSpinner from '../ui/LoadingSpinner';
 import ErrorMessage from '../ui/ErrorMessage';
-import { GdpDataItem, TimeRange } from '../../types/gdpTypes';
+import { GdpDataItem, TimeRange } from '../../types/economicTypes';
 import { calculateGdpSummary, formatCurrency } from '../../utils/dataUtils';
 import * as ss from 'simple-statistics';
 import regression from 'regression';
@@ -15,7 +15,6 @@ import Select from 'react-select';
 const GdpTab: React.FC = () => {
   const [timeRange, setTimeRange] = useState<TimeRange>('all');
   const [selectedCountries, setSelectedCountries] = useState([{ value: 'MYS', label: 'Malaysia' }]);
-  // const [showDebug, setShowDebug] = useState(false);
 
   // Fetch GDP data for all selected countries in parallel
   const countryCodes = selectedCountries.map(c => c.value);
@@ -93,12 +92,6 @@ const GdpTab: React.FC = () => {
   const slope = regResult ? regResult.equation[0] : null;
   const intercept = regResult ? regResult.equation[1] : null;
   const r2 = regResult ? regResult.r2 : null;
-
-  // Prepare columns for table
-  const columns: TableColumn<GdpDataItem>[] = [
-    { key: 'year', label: 'Year', align: 'left' },
-    { key: 'value', label: 'GDP Per Capita', align: 'right', formatter: (v) => formatCurrency(v) },
-  ];
 
   // Generate CSV for all selected countries
   const generateCsv = () => {
@@ -288,12 +281,12 @@ const GdpTab: React.FC = () => {
       <div className="card">
         <Table
           columns={[
-            { key: 'year', label: 'Year', align: 'left' },
+            { key: 'year', label: 'Year', align: 'left' as const },
             ...selectedCountries.map((c) => ({
               key: c.value,
               label: c.label,
-              align: "right" as const,
-              formatter: (v: number) => formatCurrency(v)
+              align: 'right' as const,
+              formatter: (v: number) => (v !== null && v !== undefined ? `$${v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : 'NaN')
             }))
           ]}
           data={(() => {

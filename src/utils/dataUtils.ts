@@ -1,4 +1,4 @@
-import { GdpDataItem, GdpDataSummary } from '../types/gdpTypes';
+import { GdpDataItem, GdpDataSummary } from '../types/economicTypes';
 
 /**
  * Calculates summary statistics for GDP data

@@ -61,7 +61,7 @@ type LineChartAllProps = LineChartSingleProps | LineChartMultiProps;
 
 const LineChart: React.FC<LineChartAllProps> = (props) => {
   if ('multi' in props && props.multi) {
-    // Multi-line mode
+    // Multi-line
     const { data, yAxisLabel = '', valueFormatter = v => v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) } = props;
     const chartData = {
       labels: data[0]?.data.map(item => item.x) || [],

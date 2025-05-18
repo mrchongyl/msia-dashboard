@@ -1,3 +1,14 @@
+export interface EconomicData {
+  country: string;
+  year: number;
+  value: number;
+}
+
+export interface EconomicDataResponse {
+  data: EconomicData[];
+  source: string;
+}
+
 // Types for World Bank data
 
 export type TimeRange = 'all' | 'last5' | 'last10' | 'last20' | 'last30' | 'since2000';

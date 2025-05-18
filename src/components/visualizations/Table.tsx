@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import DataTable, { TableColumn as RDCColumn } from 'react-data-table-component';
 
 export interface TableColumn<T> {
   key: keyof T;
@@ -15,20 +16,7 @@ interface TableProps<T> {
 }
 
 function Table<T extends { [key: string]: any }>({ columns, data, rowsPerPage = 10, title }: TableProps<T>) {
-  const [sortField, setSortField] = useState<keyof T>(columns[0].key);
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
-  const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState('');
-
-  // Handle sort
-  const handleSort = (field: keyof T) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortField(field);
-      setSortDirection('desc');
-    }
-  };
 
   // Filter data by search
   const filteredData = search
@@ -40,22 +28,17 @@ function Table<T extends { [key: string]: any }>({ columns, data, rowsPerPage = 
       )
     : data;
 
-  // Sort data
-  const sortedData = [...filteredData].sort((a, b) => {
-    const aValue = a[sortField];
-    const bValue = b[sortField];
-    if (typeof aValue === 'number' && typeof bValue === 'number') {
-      return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
-    }
-    return sortDirection === 'asc'
-      ? String(aValue).localeCompare(String(bValue))
-      : String(bValue).localeCompare(String(aValue));
-  });
-
-  // Pagination
-  const totalPages = Math.ceil(sortedData.length / rowsPerPage);
-  const startIndex = (currentPage - 1) * rowsPerPage;
-  const paginatedData = sortedData.slice(startIndex, startIndex + rowsPerPage);
+  const rdcColumns: RDCColumn<T>[] = columns.map(col => ({
+    name: col.label,
+    selector: row => row[col.key],
+    sortable: true,
+    right: col.align === 'right',
+    cell: col.formatter
+      ? row => col.formatter!(row[col.key], row)
+      : row => row[col.key],
+    style: col.align === 'right' ? { justifyContent: 'flex-end', textAlign: 'right' } : {},
+    wrap: false,
+  }));
 
   return (
     <div>
@@ -70,66 +53,25 @@ function Table<T extends { [key: string]: any }>({ columns, data, rowsPerPage = 
         />
         {title && <h3 className="text-lg font-semibold text-slate-800 mr-auto">{title}</h3>}
       </div>
-      <div className="overflow-x-auto">
-        <table className="w-full divide-y divide-slate-200">
-          <thead>
-            <tr>
-              {columns.map(col => (
-                <th
-                  key={String(col.key)}
-                  className={`px-6 py-3 text-xs font-bold text-slate-800 uppercase tracking-wider cursor-pointer text-${col.align || 'left'} ${col.align === 'right' ? 'text-right' : ''}`}
-                  onClick={() => handleSort(col.key)}
-                >
-                  <div className={`flex items-center ${col.align === 'right' ? 'justify-end' : ''}`}>
-                    {col.label}
-                    {sortField === col.key ? (
-                      sortDirection === 'asc' ? ' ▲' : ' ▼'
-                    ) : (
-                      <span className="ml-1 text-slate-400">⇅</span>
-                    )}
-                  </div>
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-slate-200">
-            {paginatedData.map((row, idx) => (
-              <tr key={idx} className="hover:bg-slate-50">
-                {columns.map(col => (
-                  <td
-                    key={String(col.key)}
-                    className={`px-6 py-4 whitespace-nowrap text-sm text-slate-800 number-mono ${col.align === 'right' ? 'text-right' : 'text-left'}`}
-                  >
-                    {col.formatter ? col.formatter(row[col.key], row) : row[col.key]}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between px-6 py-4 bg-white border-t border-slate-200">
-          <button
-            onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
-            disabled={currentPage === 1}
-            className="btn text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Previous
-          </button>
-          <span className="text-sm text-slate-700">
-            Page {currentPage} of {totalPages}
-          </span>
-          <button
-            onClick={() => setCurrentPage(Math.min(currentPage + 1, totalPages))}
-            disabled={currentPage === totalPages}
-            className="btn text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Next
-          </button>
-        </div>
-      )}
+      <DataTable
+        columns={rdcColumns}
+        data={filteredData}
+        pagination
+        paginationPerPage={rowsPerPage}
+        highlightOnHover
+        striped
+        responsive
+        persistTableHead
+        noHeader
+        customStyles={{
+          table: { style: { minWidth: '100%' } },
+          headRow: { style: { backgroundColor: 'white', borderBottom: '1px solid #e2e8f0' } },
+          headCells: { style: { fontWeight: 700, color: '#1e293b', fontSize: 13, textTransform: 'uppercase', background: 'white' } },
+          rows: { style: { backgroundColor: 'white', borderBottom: '1px solid #e2e8f0', fontSize: 14 } },
+          cells: { style: { padding: '1rem 1.5rem', fontFamily: 'inherit' } },
+          pagination: { style: { background: 'white', borderTop: '1px solid #e2e8f0', padding: '1rem 1.5rem' } },
+        }}
+      />
     </div>
   );
 }

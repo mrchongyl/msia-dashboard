@@ -2,7 +2,7 @@ import React from 'react';
 import { useQuery } from 'react-query';
 import { ExternalLink, BarChart, DollarSign, TrendingUp, CreditCard, Percent, Wifi, CircleDollarSign } from 'lucide-react';
 import { fetchGdpPerCapita, fetchCreditCardUsage, fetchInflation, fetchCpi, fetchMobileInternetBanking } from '../../services/apiService';
-import { GdpDataSummary } from '../../types/gdpTypes';
+import { GdpDataSummary } from '../../types/economicTypes';
 import { calculateGdpSummary } from '../../utils/dataUtils';
 import LoadingSpinner from '../ui/LoadingSpinner';
 import ErrorMessage from '../ui/ErrorMessage';
@@ -154,7 +154,11 @@ const OverviewTab: React.FC = () => {
                 <p className="text-2xl font-semibold number-mono text-slate-800">
                   {avgInflation !== null ? avgInflation.toFixed(2) + '%' : '--'}
                 </p>
-                <p className="text-xs text-slate-500">{inflationData?.[0]?.year} - {inflationData?.[inflationData.length-1]?.year}</p>
+                <p className="text-xs text-slate-500">
+                  {Array.isArray(inflationData) && inflationData.length > 0
+                    ? `${inflationData[0].year} - ${inflationData[inflationData.length - 1].year}`
+                    : '--'}
+                </p>
               </div>
             </div>
           </div>
@@ -221,17 +225,17 @@ const OverviewTab: React.FC = () => {
       <div className="card p-6 mb-8">
         <h3 className="text-lg font-medium text-slate-800 mb-2">Statistical Insights</h3>
         <ul className="list-disc pl-6 text-slate-700 text-base space-y-2">
-          {gdpData && gdpData.length > 1 && (
+          {Array.isArray(gdpData) && gdpData.length > 1 && (
             <li>
               GDP per capita grew from <b>{formatCurrency(gdpData[0].value)}</b> in {gdpData[0].year} to <b>{formatCurrency(gdpData[gdpData.length-1].value)}</b> in {gdpData[gdpData.length-1].year}, a total increase of <b>{(((gdpData[gdpData.length-1].value - gdpData[0].value) / gdpData[0].value) * 100).toFixed(1)}%</b>.
             </li>
           )}
-          {inflationData && inflationData.length > 1 && (
+          {Array.isArray(inflationData) && inflationData.length > 1 && (
             <li>
-              The average annual inflation rate was <b>{avgInflation !== null ? avgInflation.toFixed(2) + '%': '--'}</b> from {inflationData[0].year} to {inflationData[inflationData.length-1].year}. Highest inflation: <b>{Math.max(...inflationData.map(d => d.value)).toFixed(2)}%</b>.
+              The average annual inflation rate was <b>{avgInflation !== null ? avgInflation.toFixed(2) + '%': '--'}</b> from {inflationData[0].year} to {inflationData[inflationData.length-1].year}. Highest inflation: <b>{Math.max(...inflationData.map((d: { value: any; }) => d.value)).toFixed(2)}%</b>.
             </li>
           )}
-          {cpiData && cpiData.length > 1 && (
+          {Array.isArray(cpiData) && cpiData.length > 1 && (
             <li>
               The Consumer Price Index (CPI) increased from <b>{cpiData[0].value.toFixed(2)}</b> in {cpiData[0].year} to <b>{cpiData[cpiData.length-1].value.toFixed(2)}</b> in {cpiData[cpiData.length-1].year}, a total increase of <b>{(((cpiData[cpiData.length-1].value - cpiData[0].value) / cpiData[0].value) * 100).toFixed(1)}%</b>.
             </li>
