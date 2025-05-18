@@ -4,25 +4,44 @@ import { GdpDataItem } from '../types/gdpTypes';
 // API base URL - points to our Flask backend
 const API_BASE_URL = 'http://localhost:5000/api';
 
+// List of ASEAN country codes and names
+export const ASEAN_COUNTRIES = [
+  { code: 'BRN', name: 'Brunei' },
+  { code: 'KHM', name: 'Cambodia' },
+  { code: 'IDN', name: 'Indonesia' },
+  { code: 'LAO', name: 'Laos' },
+  { code: 'MYS', name: 'Malaysia' },
+  { code: 'MMR', name: 'Myanmar' },
+  { code: 'PHL', name: 'Philippines' },
+  { code: 'SGP', name: 'Singapore' },
+  { code: 'THA', name: 'Thailand' },
+  { code: 'VNM', name: 'Vietnam' },
+];
+
 /**
- * Fetches GDP per capita data from the API
+ * Fetches GDP per capita data for a given country from the API
+ * @param countryCode ISO3 country code (e.g., 'MYS')
  * @returns {Promise<GdpDataItem[]>} Array of GDP data items
  */
-export const fetchGdpPerCapita = async (): Promise<GdpDataItem[]> => {
+export const fetchGdpPerCapita = async (countryCode: string = 'MYS'): Promise<GdpDataItem[]> => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/gdp-per-capita`);
+    const response = await axios.get(`${API_BASE_URL}/gdp-per-capita`, { params: { country: countryCode } });
     console.log('API raw response:', response.data);
-    
-    // Extract the data from the response
-    const rawData = Array.isArray(response.data.data?.value) ? response.data.data.value : [];
-    
-    // Transform the data into our format
-    const formattedData: GdpDataItem[] = rawData.map((item: any) => ({
-      year: item.TIME_PERIOD,
-      value: parseFloat(item.OBS_VALUE),
-    }));
-    
-    // Sort by year ascending
+    // Robustly extract the data array
+    let rawData: any[] = [];
+    if (Array.isArray(response.data.data)) {
+      rawData = response.data.data;
+    } else if (response.data.data && Array.isArray(response.data.data.value)) {
+      rawData = response.data.data.value;
+    } else if (Array.isArray(response.data.data?.data)) {
+      rawData = response.data.data.data;
+    }
+    const formattedData: GdpDataItem[] = rawData
+      .filter((item: any) => item.OBS_VALUE !== null && item.OBS_VALUE !== undefined && !isNaN(Number(item.OBS_VALUE)))
+      .map((item: any) => ({
+        year: item.TIME_PERIOD,
+        value: parseFloat(item.OBS_VALUE),
+      }));
     return formattedData.sort((a, b) => parseInt(a.year) - parseInt(b.year));
   } catch (error) {
     console.error('Error fetching GDP data:', error);

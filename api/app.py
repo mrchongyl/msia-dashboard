@@ -4,29 +4,32 @@ import requests
 import os
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
+# Enable CORS for all routes
+CORS(app)
 
 @app.route('/api/gdp-per-capita', methods=['GET'])
 def get_gdp_per_capita():
-    """Proxy endpoint to fetch GDP per capita data from World Bank Data360 API"""
+    """Proxy endpoint to fetch GDP per capita data from World Bank Data360 API for ASEAN countries"""
     try:
+        # ASEAN country codes
+        asean_countries = ["BRN", "KHM", "IDN", "LAO", "MYS", "MMR", "PHL", "SGP", "THA", "VNM"]
         # Parse query parameters
         start_year = request.args.get('from', '1960')
         end_year = request.args.get('to', '2023')
-        
+        country = request.args.get('country', 'MYS').upper()
+        if country not in asean_countries:
+            return jsonify({"error": f"Invalid country code. Must be one of: {', '.join(asean_countries)}"}), 400
         # World Bank API endpoint
         url = f"https://data360api.worldbank.org/data360/data"
-        
         # Query parameters
         params = {
             'DATABASE_ID': 'WB_WDI',
             'INDICATOR': 'WB_WDI_NY_GDP_PCAP_CD',
-            'REF_AREA': 'MYS',
+            'REF_AREA': country,
             'timePeriodFrom': start_year,
             'timePeriodTo': end_year,
             'skip': 0
         }
-        
         # Make request to World Bank API
         response = requests.get(url, params=params)
         response.raise_for_status()  # Raise exception for HTTP errors
@@ -37,7 +40,6 @@ def get_gdp_per_capita():
             return jsonify({'data': wb_data['data']})
         else:
             return jsonify({'data': wb_data})
-    
     except requests.exceptions.RequestException as e:
         return jsonify({"error": f"API request failed: {str(e)}"}), 500
     except Exception as e:
