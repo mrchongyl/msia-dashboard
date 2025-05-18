@@ -13,7 +13,7 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, setActiveTab }
       <div className="flex flex-wrap gap-2 bg-slate-100 p-1 rounded-lg w-full overflow-x-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
         <button
           className={`tab flex items-center ${
-            activeTab === 'overview' ? 'tab-active' : 'tab-inactive'
+            activeTab === 'overview' ? 'tab-active bg-blue-900 text-white' : 'tab-inactive'
           }`}
           onClick={() => setActiveTab('overview')}
         >

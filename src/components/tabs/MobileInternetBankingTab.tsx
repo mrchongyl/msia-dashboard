@@ -130,6 +130,7 @@ const MobileInternetBankingTab: React.FC = () => {
           <div style={{ minWidth: 220 }}>
             <Select
               isMulti
+              isSearchable={true}
               options={ASEAN_COUNTRIES.map(c => ({ value: c.code, label: c.name, isDisabled: c.code === 'MYS' }))}
               value={selectedCountries}
               onChange={opts => {
@@ -281,7 +282,7 @@ const MobileInternetBankingTab: React.FC = () => {
             ...selectedCountries.map((c) => ({
               key: c.value,
               label: c.label,
-              align: 'right',
+              align: 'right' as 'right',
               formatter: (v: number) => v !== null && v !== undefined ? v.toLocaleString('en-US') : ''
             }))
           ]}

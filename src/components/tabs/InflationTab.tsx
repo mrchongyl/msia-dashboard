@@ -138,6 +138,7 @@ const InflationTab: React.FC = () => {
           <div style={{ minWidth: 220 }}>
             <Select
               isMulti
+              isSearchable={true}
               options={ASEAN_COUNTRIES.map(c => ({ value: c.code, label: c.name, isDisabled: c.code === 'MYS' }))}
               value={selectedCountries}
               onChange={opts => {
@@ -278,11 +279,11 @@ const InflationTab: React.FC = () => {
       <div className="card">
         <Table
           columns={[
-            { key: 'year', label: 'Year', align: 'left' },
+            { key: 'year', label: 'Year', align: 'left' as const },
             ...selectedCountries.map((c) => ({
               key: c.value,
               label: c.label,
-              align: 'right',
+              align: 'right' as const,
               formatter: (v: number) => v !== null && v !== undefined ? v.toFixed(2) + '%' : ''
             }))
           ]}

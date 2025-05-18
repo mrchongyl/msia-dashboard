@@ -134,6 +134,7 @@ const CpiTab: React.FC = () => {
           <div style={{ minWidth: 220 }}>
             <Select
               isMulti
+              isSearchable={true}
               options={ASEAN_COUNTRIES.map(c => ({ value: c.code, label: c.name, isDisabled: c.code === 'MYS' }))}
               value={selectedCountries}
               onChange={opts => {
@@ -208,7 +209,7 @@ const CpiTab: React.FC = () => {
         )}
       </div>
 
-      {/* Summary Section - moved below chart */}
+      {/* Summary Section */}
       {summary && (
         <div className="mb-8">
           <h3 className="text-xl font-semibold text-slate-800 mb-4">Malaysia CPI Summary</h3>
@@ -274,11 +275,11 @@ const CpiTab: React.FC = () => {
       <div className="card">
         <Table
           columns={[
-            { key: 'year', label: 'Year', align: 'left' },
+            { key: 'year', label: 'Year', align: "left" as const },
             ...selectedCountries.map((c) => ({
               key: c.value,
               label: c.label,
-              align: 'right',
+              align: "right" as const,
               formatter: (v: number) => v !== null && v !== undefined ? v.toFixed(2) : ''
             }))
           ]}

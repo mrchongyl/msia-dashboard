@@ -14,7 +14,7 @@ const DocumentationTab: React.FC = () => {
         </p>
       </div>
       {/* Content sections */}
-      <div className="border-l-4 border-yellow-400 p-6 mb-8">
+      <div className="border-l-4 border-yellow-400 p-6 mb-8 bg-white card">
         <h3 className="text-lg font-semibold text-yellow-700 mb-2">Architecture Overview</h3>
         <ul className="list-disc pl-6 text-black text-base mb-2">
           <li><b>Frontend Framework:</b> React (TypeScript, Vite)</li>
@@ -27,7 +27,7 @@ const DocumentationTab: React.FC = () => {
           <li><b>Component Architecture:</b> Modular, reusable components for charts, tables, cards, and UI</li>
         </ul>
       </div>
-      <div className="border-l-4 border-yellow-400 p-6 mb-8">
+      <div className="border-l-4 border-yellow-400 p-6 mb-8 bg-white card">
         <h3 className="text-lg font-semibold text-yellow-700 mb-2">API Endpoint Integrations</h3>
         <ul className="list-disc pl-6 text-black text-base mb-2">
           <li><b>Flask Backend Endpoints:</b></li>
@@ -42,28 +42,18 @@ const DocumentationTab: React.FC = () => {
           <li>Frontend uses <code>apiService.ts</code> for all data fetching, with TypeScript types for safety.</li>
         </ul>
       </div>
-      <div className="border-l-4 border-yellow-400 p-6 mb-8">
+      <div className="border-l-4 border-yellow-400 p-6 mb-8 bg-white card">
         <h3 className="text-lg font-semibold text-yellow-700 mb-2">CI/CD Pipeline (GitHub)</h3>
         <ul className="list-disc pl-6 text-black text-base mb-2">
-          <li><b>Version Control:</b> Git & GitHub</li>
+          <li><b>Version Control:</b> GitHub</li>
           <li><b>CI/CD:</b> GitHub Actions for automated testing and deployment</li>
           <li><b>Typical Workflow:</b></li>
           <ul className="list-disc pl-8">
             <li>Pushes and pull requests trigger linting, type checks, and tests</li>
             <li>On main branch merge, build and deploy steps run automatically</li>
-            <li>Deployment can be configured to Vercel, Netlify, or a custom server</li>
+            <li>Deployment is configured to AWS EC2 and Elastic Beanstalk</li>
           </ul>
           <li>See <a href="https://docs.github.com/en/actions" target="_blank" rel="noopener noreferrer" className="text-yellow-700 underline flex items-center">GitHub Actions Docs <ExternalLink className="h-3 w-3 ml-1" /></a></li>
-        </ul>
-      </div>
-      <div className="bg-gray-50 border-l-4 border-yellow-400 p-6">
-        <h3 className="text-lg font-semibold text-yellow-700 mb-2">Further Reading</h3>
-        <ul className="list-disc pl-6 text-black text-base">
-          <li><a href="https://vitejs.dev/" target="_blank" rel="noopener noreferrer" className="text-yellow-700 underline">Vite Documentation</a></li>
-          <li><a href="https://react.dev/" target="_blank" rel="noopener noreferrer" className="text-yellow-700 underline">React Documentation</a></li>
-          <li><a href="https://tailwindcss.com/docs" target="_blank" rel="noopener noreferrer" className="text-yellow-700 underline">Tailwind CSS Docs</a></li>
-          <li><a href="https://www.chartjs.org/docs/latest/" target="_blank" rel="noopener noreferrer" className="text-yellow-700 underline">Chart.js Docs</a></li>
-          <li><a href="https://github.com/features/actions" target="_blank" rel="noopener noreferrer" className="text-yellow-700 underline">GitHub Actions</a></li>
         </ul>
       </div>
     </div>

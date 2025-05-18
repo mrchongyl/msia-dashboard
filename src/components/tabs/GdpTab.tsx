@@ -146,6 +146,7 @@ const GdpTab: React.FC = () => {
           <div style={{ minWidth: 220 }}>
             <Select
               isMulti
+              isSearchable={true}
               options={ASEAN_COUNTRIES.map(c => ({ value: c.code, label: c.name, isDisabled: c.code === 'MYS' }))}
               value={selectedCountries}
               onChange={opts => {
@@ -291,7 +292,7 @@ const GdpTab: React.FC = () => {
             ...selectedCountries.map((c) => ({
               key: c.value,
               label: c.label,
-              align: 'right',
+              align: "right" as const,
               formatter: (v: number) => formatCurrency(v)
             }))
           ]}

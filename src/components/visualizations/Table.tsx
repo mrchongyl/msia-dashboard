@@ -30,8 +30,18 @@ function Table<T extends { [key: string]: any }>({ columns, data, rowsPerPage = 
     }
   };
 
+  // Filter data by search
+  const filteredData = search
+    ? data.filter(row =>
+        columns.some(col => {
+          const value = row[col.key];
+          return value !== undefined && value !== null && String(value).toLowerCase().includes(search.toLowerCase());
+        })
+      )
+    : data;
+
   // Sort data
-  const sortedData = [...data].sort((a, b) => {
+  const sortedData = [...filteredData].sort((a, b) => {
     const aValue = a[sortField];
     const bValue = b[sortField];
     if (typeof aValue === 'number' && typeof bValue === 'number') {
