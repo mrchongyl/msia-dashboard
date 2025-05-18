@@ -51,9 +51,9 @@ const DocumentationTab: React.FC = () => {
           <ul className="list-disc pl-8">
             <li>Pushes and pull requests trigger linting, type checks, and tests</li>
             <li>On main branch merge, build and deploy steps run automatically</li>
-            <li>Deployment is configured to AWS EC2 and Elastic Beanstalk</li>
+            <li>Frontend is deployed to AWS EC2</li>
+            <li>Backend is deployed to AWS Elastic Beanstalk</li>
           </ul>
-          <li>See <a href="https://docs.github.com/en/actions" target="_blank" rel="noopener noreferrer" className="text-yellow-700 underline flex items-center">GitHub Actions Docs <ExternalLink className="h-3 w-3 ml-1" /></a></li>
         </ul>
       </div>
     </div>

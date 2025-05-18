@@ -121,7 +121,7 @@ const OverviewTab: React.FC = () => {
           Malaysia Economic Overview
         </h2>
         <p className="text-slate-600 w-full">
-         Gain insights into Malaysia’s economic landscape through key indicators from the World Bank. This dashboard presents data on GDP per capita, inflation trends, and consumer prices, along with the use of financial services such as credit card adoption and mobile or internet banking transactions by commercial banks. Explore the data to understand the economic growth and financial behavior of Malaysia over the years.
+         Gain insights into Malaysia’s economic landscape through key indicators from the World Bank. This overview page presents data on GDP per capita, inflation trends, and consumer prices, along with the use of financial services such as credit card adoption and mobile or internet banking transactions by commercial banks. Explore the data to understand the economic growth and financial behavior of Malaysia over the years.
         </p>
       </div>
 
