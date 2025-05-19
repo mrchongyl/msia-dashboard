@@ -14,6 +14,10 @@ const LoginPage: React.FC<{ onLogin?: () => void }> = ({ onLogin }) => {
   const [signupPassword, setSignupPassword] = useState('');
   const [signupLoading, setSignupLoading] = useState(false);
   const [signupError, setSignupError] = useState<string | null>(null);
+  const [showReset, setShowReset] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetMessage, setResetMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -26,6 +30,7 @@ const LoginPage: React.FC<{ onLogin?: () => void }> = ({ onLogin }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     setError(null);
     try {
       await signInWithEmailAndPassword(auth, email, password);
@@ -55,6 +60,65 @@ const LoginPage: React.FC<{ onLogin?: () => void }> = ({ onLogin }) => {
       setSignupLoading(false);
     }
   };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setResetLoading(true);
+    setResetMessage(null);
+    try {
+      const { sendPasswordResetEmail } = await import("firebase/auth");
+      await sendPasswordResetEmail(auth, resetEmail);
+      setResetMessage("Password reset email sent. Please check your inbox.");
+    } catch (err: any) {
+      setResetMessage(err.message || "Failed to send reset email");
+    } finally {
+      setResetLoading(false);
+    }
+  };
+
+  if (showReset) {
+    return (
+      <div className="slide-in flex items-center justify-center min-h-screen bg-slate-100">
+        <form
+          onSubmit={handleResetPassword}
+          className="card p-8 w-full max-w-md shadow-lg bg-white border border-slate-200"
+        >
+          <h2 className="text-2xl font-bold text-slate-900 mb-6 text-center flex items-center justify-center">Reset Password</h2>
+          <div className="mb-6">
+            <label className="block text-blue-900 mb-2 font-medium" htmlFor="reset-email">Email</label>
+            <input
+              id="reset-email"
+              type="email"
+              className="w-full px-4 py-2 border border-blue-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-900/60 text-blue-900 bg-slate-50 placeholder:text-blue-300"
+              value={resetEmail}
+              onChange={e => setResetEmail(e.target.value)}
+              required
+              autoFocus
+              placeholder="Enter your email"
+            />
+          </div>
+          {resetMessage && <ErrorMessage message={resetMessage} />}
+          <div className="flex gap-2">
+            <button
+              type="button"
+              className="w-1/2 bg-slate-200 hover:bg-slate-300 text-blue-900 font-semibold py-2 rounded transition shadow-sm"
+              onClick={() => setShowReset(false)}
+              disabled={resetLoading}
+            >
+              Back to Login
+            </button>
+            <button
+              type="submit"
+              className="w-1/2 bg-blue-900 hover:bg-blue-800 text-white font-semibold py-2 rounded transition shadow-sm"
+              disabled={resetLoading}
+            >
+              {resetLoading ? <LoadingSpinner /> : 'Send Email'}
+            </button>
+          </div>
+        </form>
+      </div>
+    );
+  }
 
   if (showSignup) {
     return (
@@ -145,6 +209,16 @@ const LoginPage: React.FC<{ onLogin?: () => void }> = ({ onLogin }) => {
           />
         </div>
         {error && <ErrorMessage message={error} />}
+        <div className="flex gap-2 mb-4 justify-end">
+          <button
+            type="button"
+            className="text-blue-700 hover:underline text-sm"
+            onClick={() => setShowReset(true)}
+            disabled={loading}
+          >
+            Forgot Password?
+          </button>
+        </div>
         <div className="flex gap-2">
           <button
             type="submit"
