@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { onAuthStateChanged } from 'firebase/auth';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from './services/firebase';
 import Header from './components/Header';
 import TabNavigation from './components/TabNavigation';
@@ -19,6 +19,8 @@ function App() {
   const [activeTab, setActiveTab] = useState<TabType>('overview');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authLoading, setAuthLoading] = useState(true);
+  const [lastActivity, setLastActivity] = useState(Date.now());
+  const INACTIVITY_LIMIT = 10 * 60 * 1000; // 10 minutes
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -27,6 +29,36 @@ function App() {
     });
     return () => unsubscribe();
   }, []);
+
+  // Activity timer
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    const resetTimer = () => setLastActivity(Date.now());
+    window.addEventListener('mousemove', resetTimer);
+    window.addEventListener('keydown', resetTimer);
+    window.addEventListener('mousedown', resetTimer);
+    window.addEventListener('touchstart', resetTimer);
+    window.addEventListener('scroll', resetTimer);
+    return () => {
+      window.removeEventListener('mousemove', resetTimer);
+      window.removeEventListener('keydown', resetTimer);
+      window.removeEventListener('mousedown', resetTimer);
+      window.removeEventListener('touchstart', resetTimer);
+      window.removeEventListener('scroll', resetTimer);
+    };
+  }, [isAuthenticated]);
+
+  // Logout on inactivity
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    const interval = setInterval(() => {
+      if (Date.now() - lastActivity > INACTIVITY_LIMIT) {
+        setIsAuthenticated(false);
+        signOut(auth);
+      }
+    }, 1000 * 30); // check every 30s
+    return () => clearInterval(interval);
+  }, [isAuthenticated, lastActivity]);
 
   if (authLoading) {
     return <div className="flex items-center justify-center min-h-screen"><span>Loading...</span></div>;
