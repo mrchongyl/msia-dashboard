@@ -3,6 +3,7 @@ import { signInWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../services/firebase';
 import LoadingSpinner from './ui/LoadingSpinner';
 import ErrorMessage from './ui/ErrorMessage';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 const LoginPage: React.FC<{ onLogin?: () => void }> = ({ onLogin }) => {
   const [email, setEmail] = useState('');
@@ -18,6 +19,7 @@ const LoginPage: React.FC<{ onLogin?: () => void }> = ({ onLogin }) => {
   const [resetEmail, setResetEmail] = useState("");
   const [resetLoading, setResetLoading] = useState(false);
   const [resetMessage, setResetMessage] = useState<string | null>(null);
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -30,6 +32,10 @@ const LoginPage: React.FC<{ onLogin?: () => void }> = ({ onLogin }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!recaptchaToken) {
+      setError('Please complete the reCAPTCHA.');
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
@@ -206,6 +212,12 @@ const LoginPage: React.FC<{ onLogin?: () => void }> = ({ onLogin }) => {
             onChange={e => setPassword(e.target.value)}
             required
             placeholder="Enter your password"
+          />
+        </div>
+        <div className="mb-6 flex justify-center">
+          <ReCAPTCHA
+            sitekey="6LcjgD8rAAAAABOsJEUpDA7yppPfrEJxL8MuGCC2"
+            onChange={token => setRecaptchaToken(token)}
           />
         </div>
         {error && <ErrorMessage message={error} />}
