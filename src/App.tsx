@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from './services/firebase';
 import Header from './components/Header';
 import TabNavigation from './components/TabNavigation';
 import OverviewTab from './components/tabs/OverviewTab';
@@ -9,42 +11,63 @@ import CpiTab from './components/tabs/CpiTab';
 import MobileInternetBankingTab from './components/tabs/MobileInternetBankingTab';
 import DocumentationTab from './components/tabs/DocumentationTab';
 import Footer from './components/Footer';
+import LoginPage from './components/LoginPage';
 
 export type TabType = 'overview' | 'gdp' | 'creditCardUsage' | 'inflation' | 'cpi' | 'mobileInternetBanking' | 'documentation';
 
 function App() {
   const [activeTab, setActiveTab] = useState<TabType>('overview');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setIsAuthenticated(!!user);
+      setAuthLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  if (authLoading) {
+    return <div className="flex items-center justify-center min-h-screen"><span>Loading...</span></div>;
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-slate-50">
-      <Header />
-      <main className="flex-grow container mx-auto px-4 py-6">
-        <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
-        <div style={{ position: 'relative', width: '100%' }}>
-          <div style={{ display: activeTab === 'overview' ? 'block' : 'none', width: '100%' }}>
-            <OverviewTab />
-          </div>
-          <div style={{ display: activeTab === 'gdp' ? 'block' : 'none', width: '100%' }}>
-            <GdpTab />
-          </div>
-          <div style={{ display: activeTab === 'creditCardUsage' ? 'block' : 'none', width: '100%' }}>
-            <CreditCardUsageTab />
-          </div>
-          <div style={{ display: activeTab === 'inflation' ? 'block' : 'none', width: '100%' }}>
-            <InflationTab />
-          </div>
-          <div style={{ display: activeTab === 'cpi' ? 'block' : 'none', width: '100%' }}>
-            <CpiTab />
-          </div>
-          <div style={{ display: activeTab === 'mobileInternetBanking' ? 'block' : 'none', width: '100%' }}>
-            <MobileInternetBankingTab />
-          </div>
-          <div style={{ display: activeTab === 'documentation' ? 'block' : 'none', width: '100%' }}>
-            <DocumentationTab />
-          </div>
-        </div>
-      </main>
-      <Footer />
+      {!isAuthenticated ? (
+        <LoginPage onLogin={() => setIsAuthenticated(true)} />
+      ) : (
+        <>
+          <Header onLogout={() => setIsAuthenticated(false)} />
+          <main className="flex-grow container mx-auto px-4 py-6">
+            <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
+            <div style={{ position: 'relative', width: '100%' }}>
+              <div style={{ display: activeTab === 'overview' ? 'block' : 'none', width: '100%' }}>
+                <OverviewTab />
+              </div>
+              <div style={{ display: activeTab === 'gdp' ? 'block' : 'none', width: '100%' }}>
+                <GdpTab />
+              </div>
+              <div style={{ display: activeTab === 'creditCardUsage' ? 'block' : 'none', width: '100%' }}>
+                <CreditCardUsageTab />
+              </div>
+              <div style={{ display: activeTab === 'inflation' ? 'block' : 'none', width: '100%' }}>
+                <InflationTab />
+              </div>
+              <div style={{ display: activeTab === 'cpi' ? 'block' : 'none', width: '100%' }}>
+                <CpiTab />
+              </div>
+              <div style={{ display: activeTab === 'mobileInternetBanking' ? 'block' : 'none', width: '100%' }}>
+                <MobileInternetBankingTab />
+              </div>
+              <div style={{ display: activeTab === 'documentation' ? 'block' : 'none', width: '100%' }}>
+                <DocumentationTab />
+              </div>
+            </div>
+          </main>
+          <Footer />
+        </>
+      )}
     </div>
   );
 }
